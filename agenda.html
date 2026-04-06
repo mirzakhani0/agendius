@@ -228,6 +228,42 @@ nav button.active{background:var(--surface2)}
 </div>
 
 <!-- ═══════════════════════════════════════
+     PANTALLA DE SETUP (primera vez)
+     ═══════════════════════════════════════ -->
+<div id="setupScreen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:3000;align-items:center;justify-content:center;padding:20px">
+  <div style="max-width:500px;width:100%;text-align:center">
+    <div style="font-size:3rem;margin-bottom:16px">📚</div>
+    <h1 style="font-size:1.8rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px">Mi Agenda de Estudio</h1>
+    <p style="color:var(--text2);margin-bottom:32px;font-size:.95rem">Configura tu Google Sheets para sincronizar tus datos</p>
+    <div style="background:var(--surface);border:1px solid var(--surface2);border-radius:var(--radius2);padding:24px;text-align:left">
+      <h3 style="font-size:1rem;margin-bottom:16px;color:var(--accent)">📋 Paso 1: Crea tu Google Sheet</h3>
+      <ol style="color:var(--text2);font-size:.85rem;line-height:1.8;padding-left:20px;margin-bottom:20px">
+        <li>Ve a <a href="https://sheets.google.com" target="_blank" style="color:var(--accent)">sheets.google.com</a> y crea una hoja nueva</li>
+        <li>Crea 4 pestañas: <b>HORARIO</b>, <b>LOGROS</b>, <b>CONFIGURACION</b>, <b>ESTADISTICAS</b></li>
+        <li>En cada pestaña pon los encabezados en la fila 1</li>
+      </ol>
+      <h3 style="font-size:1rem;margin-bottom:16px;color:var(--accent)">⚡ Paso 2: Crea el Apps Script</h3>
+      <ol style="color:var(--text2);font-size:.85rem;line-height:1.8;padding-left:20px;margin-bottom:20px">
+        <li>En tu Sheet: <b>Extensiones → Apps Script</b></li>
+        <li>Pega el código del script (ver instrucciones en la app)</li>
+        <li>Implementa como <b>Aplicación web</b> → "Cualquier persona"</li>
+      </ol>
+      <h3 style="font-size:1rem;margin-bottom:16px;color:var(--accent)">🔗 Paso 3: Pega tu URL</h3>
+      <div class="form-group" style="margin-bottom:16px">
+        <label style="display:block;font-size:.8rem;color:var(--text2);margin-bottom:6px">URL del Apps Script (termina en /exec)</label>
+        <input type="url" id="setupSheetUrl" placeholder="https://script.google.com/macros/s/.../exec" style="width:100%;background:var(--surface2);border:1px solid var(--surface3);color:var(--text);padding:12px 14px;border-radius:var(--radius);font-family:inherit;font-size:.9rem;outline:none">
+      </div>
+      <div class="form-group" style="margin-bottom:16px">
+        <label style="display:block;font-size:.8rem;color:var(--text2);margin-bottom:6px">Tu nombre</label>
+        <input type="text" id="setupName" placeholder="¿Cómo te llamas?" style="width:100%;background:var(--surface2);border:1px solid var(--surface3);color:var(--text);padding:12px 14px;border-radius:var(--radius);font-family:inherit;font-size:.9rem;outline:none">
+      </div>
+      <button class="btn" id="setupStart" style="width:100%;padding:14px;font-size:1rem">🚀 Comenzar</button>
+    </div>
+    <p style="color:var(--text3);font-size:.75rem;margin-top:16px">¿Ya tienes cuenta? <a href="#" id="setupLogin" style="color:var(--accent)">Iniciar sesión</a></p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
      VISTA 2: SEMANA
      ═══════════════════════════════════════ -->
 <div id="view-week" class="view">
@@ -290,6 +326,7 @@ nav button.active{background:var(--surface2)}
         <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;cursor:pointer"><input type="checkbox" id="cfgFocus"> Modo Focus</label>
       </div>
       <div class="btn-group mt-12"><button class="btn" id="btnSaveConfig">💾 Guardar Configuración</button></div>
+      <div class="btn-group"><button class="btn btn-danger" id="btnChangeAccount">🔄 Cambiar de cuenta</button></div>
     </div>
     <!-- ESTADÍSTICAS -->
     <div class="admin-section" id="sec-stats">
@@ -538,7 +575,7 @@ const CAT_BADGES={ciencias:'badge-green',matematicas:'badge-blue',social:'badge-
 let state={
   schedule:{},
   logs:{},
-  config:{name:'Estudiante',pin:'1234',sheetUrl:'https://script.google.com/macros/s/AKfycby27PGqhFy75qy9yayRA-kx1PzeWI0krFMALfig4wcKMJTnOFcJ_ziel74qakj6kIqAOA/exec',sheetId:'',colors:{...CAT_COLORS},startHour:'04:00',sound:true,notifications:false,focus:false},
+  config:{name:'Estudiante',pin:'1234',sheetUrl:'',sheetId:'',colors:{...CAT_COLORS},startHour:'04:00',sound:true,notifications:false,focus:false},
   streak:0,
   selectedDay:'',
   selectedBlock:null,
@@ -1129,12 +1166,51 @@ function renderAdmin(){
 function init(){
   loadState();
   state.selectedDay=getCurrentDayName();
-  renderTodayView();
-  updateSyncStatus('green','Listo');
+
+  if(!state.config.sheetUrl){
+    document.getElementById('setupScreen').style.display='flex';
+    document.getElementById('mainNav').style.display='none';
+    document.getElementById('view-today').style.display='none';
+  } else {
+    renderTodayView();
+    updateSyncStatus('green','Listo');
+  }
 
   setInterval(()=>{if(document.getElementById('view-today').classList.contains('active'))renderTodayView()},60000);
   if(state.config.notifications&&'Notification'in window)Notification.requestPermission();
 }
+
+document.getElementById('setupStart').addEventListener('click',()=>{
+  const url=document.getElementById('setupSheetUrl').value.trim();
+  const name=document.getElementById('setupName').value.trim();
+  if(!url){alert('Pega la URL de tu Apps Script');return}
+  if(!url.includes('script.google.com')){alert('La URL debe ser de script.google.com');return}
+  if(!name){alert('Dinos tu nombre');return}
+  state.config.sheetUrl=url;
+  state.config.name=name;
+  saveState();
+  document.getElementById('setupScreen').style.display='none';
+  document.getElementById('mainNav').style.display='';
+  document.getElementById('view-today').style.display='';
+  renderTodayView();
+  updateSyncStatus('green','Listo');
+});
+
+document.getElementById('setupLogin').addEventListener('click',(e)=>{
+  e.preventDefault();
+  document.getElementById('setupScreen').style.display='none';
+  document.getElementById('mainNav').style.display='';
+  document.getElementById('view-today').style.display='';
+  renderTodayView();
+  updateSyncStatus('green','Listo');
+});
+
+document.getElementById('btnChangeAccount').addEventListener('click',()=>{
+  if(!confirm('¿Cambiar de cuenta? Se mostrará la pantalla de configuración para poner otra URL de Sheets.'))return;
+  state.config.sheetUrl='';
+  saveState();
+  location.reload();
+});
 init();
 </script>
 
