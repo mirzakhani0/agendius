@@ -1125,31 +1125,61 @@ async function init(){
   state.selectedDay=getCurrentDayName();
   renderTodayView();
 
-  // Auto-sync al cargar
+  // Sync en background sin bloquear
   if(state.config.sheetUrl){
     updateSyncStatus('yellow','Sincronizando...');
-    // Primero importar datos existentes desde Sheets
+    syncFromSheets().catch(()=>{});
+  } else {
+    updateSyncStatus('red','Sin Sheets');
+  }
+
+  setInterval(()=>{if(document.getElementById('view-today').classList.contains('active'))renderTodayView()},60000);
+  if(state.config.notifications&&'Notification'in window)Notification.requestPermission();
+}
+
+async function syncFromSheets(){
+  try{
+    // Importar horario
     const r1 = await sheetsCall('leer','HORARIO');
     if(r1.success && r1.data && r1.data.length > 0){
       const sched={};
+      let validBlocks = 0;
       r1.data.forEach(row=>{
-        const day=row.dia||row['dia']; if(!day)return;
+        const day=row.dia||row['dia'];
+        const rawTime=row.hora||row['hora'];
+        const subject=row.materia||row['materia'];
+        if(!day||!rawTime||!subject)return;
+        const time=sheetTimeToHHMM(rawTime);
+        const dur=parseInt(row.duracion_min||row['duracion_min']||30);
+        const cat=row.categoria||row['categoria']||'ciencias';
         if(!sched[day])sched[day]=[];
-        sched[day].push({time:sheetTimeToHHMM(row.hora||row['hora']||'00:00'),subject:row.materia||row['materia']||'',dur:parseInt(row.duracion_min||row['duracion_min']||30),cat:row.categoria||row['categoria']||'ciencias'});
+        sched[day].push({time,subject,dur,cat});
+        validBlocks++;
       });
-      state.schedule=sched;
+      if(validBlocks > 0) state.schedule = sched;
     }
+
     // Importar logros
     const r2 = await sheetsCall('leer','LOGROS');
     if(r2.success && r2.data && r2.data.length > 0){
       const logsByDate={};
       r2.data.forEach(row=>{
-        const fecha=row.fecha||row['fecha']; if(!fecha)return;
+        const fecha=row.fecha||row['fecha'];
+        const time=row.hora||row['hora'];
+        const subject=row.materia||row['materia'];
+        if(!fecha||!time||!subject)return;
         if(!logsByDate[fecha])logsByDate[fecha]=[];
-        logsByDate[fecha].push({time:row.hora||row['hora'],subject:row.materia||row['materia'],status:row.status||row['status'],note:row.nota||row['nota']||null,timestamp:row.timestamp||row['timestamp']||Date.now()});
+        logsByDate[fecha].push({
+          time:sheetTimeToHHMM(time),
+          subject,
+          status:row.status||row['status'],
+          note:row.nota||row['nota']||null,
+          timestamp:row.timestamp||row['timestamp']||Date.now()
+        });
       });
       state.logs={...state.logs,...logsByDate};
     }
+
     // Importar config
     const r3 = await sheetsCall('leer','CONFIGURACION');
     if(r3.success && r3.data){
@@ -1161,21 +1191,20 @@ async function init(){
         if(key==='colores_json')try{state.config.colors=JSON.parse(val)}catch(e){}
       });
     }
+
     saveState();
     renderTodayView();
     updateSyncStatus('green','Sincronizado');
 
-    // Enviar horario actual a Sheets (por si hay cambios locales)
+    // Enviar horario a Sheets
     const horarioData=[];
     DAYS_ES.forEach(day=>{(state.schedule[day]||[]).forEach(b=>{horarioData.push({dia:day,hora:b.time,materia:b.subject,duracion_min:b.dur,categoria:b.cat})})});
-    sheetsCall('escribir','HORARIO',horarioData);
-  } else {
-    updateSyncStatus('red','Sin Sheets configurado');
+    if(horarioData.length > 0) sheetsCall('escribir','HORARIO',horarioData).catch(()=>{});
+  }catch(e){
+    updateSyncStatus('red','Error sync');
   }
-
-  setInterval(()=>{if(document.getElementById('view-today').classList.contains('active'))renderTodayView()},60000);
-  if(state.config.notifications&&'Notification'in window)Notification.requestPermission();
 }
+
 init();
 </script>
 
