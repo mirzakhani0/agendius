@@ -11,8 +11,8 @@
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --bg:#0a0a14;--surface:#12121f;--surface2:#1a1a2e;--surface3:#24243a;
-  --text:#e8e8f0;--text2:#a0a0b8;--text3:#6a6a82;
+  --bg:#000000;--surface:#0a0a0a;--surface2:#111111;--surface3:#1a1a1a;
+  --text:#ffffff;--text2:#a0a0a0;--text3:#555555;
   --accent:#7c3aed;--accent2:#9333ea;--gold:#c9a84c;
   --ciencias:#22c55e;--matematicas:#3b82f6;--social:#f97316;
   --verbal:#0ea5e9;--bienestar:#7c3aed;--descanso:#4b5563;
@@ -26,10 +26,10 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
 /* ═══════════════════════════════════════
    LANDING PAGE
    ═══════════════════════════════════════ */
-.landing{position:fixed;inset:0;z-index:5000;background:var(--bg);display:flex;align-items:center;justify-content:center;transition:opacity .5s,transform .5s}
+.landing{position:fixed;inset:0;z-index:5000;background:#000;display:flex;align-items:center;justify-content:center;transition:opacity .5s,transform .5s}
 .landing.hidden{opacity:0;pointer-events:none;transform:scale(1.05)}
 .landing-content{text-align:center;max-width:600px;padding:40px 24px}
-.landing-logo{font-size:3.5rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px;letter-spacing:-1px}
+.landing-logo{font-size:3.5rem;font-weight:800;color:#fff;margin-bottom:8px;letter-spacing:-1px}
 .landing-tagline{font-size:1.1rem;color:var(--text2);margin-bottom:48px;font-weight:300}
 .landing-features{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:48px;text-align:left}
 .landing-feat{background:var(--surface);border:1px solid var(--surface2);border-radius:var(--radius);padding:20px;transition:var(--transition)}
@@ -69,12 +69,12 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
 /* ═══════════════════════════════════════
    SIDEBAR
    ═══════════════════════════════════════ */
-.sidebar{position:fixed;left:0;top:0;bottom:0;width:var(--sidebar-w);background:linear-gradient(180deg,#0e0e1a 0%,#141428 100%);border-right:1px solid var(--surface2);z-index:1000;display:none;flex-direction:column}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:var(--sidebar-w);background:#000;border-right:1px solid #1a1a1a;z-index:1000;display:none;flex-direction:column}
 @media(min-width:1024px){.sidebar{display:flex}}
 .sidebar-header{padding:24px 20px 16px;border-bottom:1px solid var(--surface2)}
 .sidebar-brand{display:flex;align-items:center;gap:10px;margin-bottom:16px}
 .sidebar-brand .brand-icon{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--gold));display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
-.sidebar-brand h2{font-size:.95rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sidebar-brand h2{font-size:.95rem;font-weight:700;color:#fff}
 .sidebar-profile{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border-radius:var(--radius);border:1px solid var(--surface2)}
 .sidebar-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:#fff;flex-shrink:0}
 .sidebar-user-name{font-size:.8rem;font-weight:600}
@@ -118,7 +118,7 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
 @keyframes spin{to{transform:rotate(360deg)}}
 
 .v-header{text-align:center;margin-bottom:24px}
-.v-header h1{font-size:1.6rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px}
+.v-header h1{font-size:1.6rem;font-weight:800;color:#fff;margin-bottom:4px}
 .v-header .dt{color:var(--text2);font-size:.85rem}
 .v-header .dt .time{font-size:1.2rem;font-weight:700;color:var(--text);animation:glow 3s infinite}
 
