@@ -7,204 +7,16 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-/* ═══════════════════════════════════════
-   RESET Y VARIABLES
-   ═══════════════════════════════════════ */
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --bg:#0f0f1a;--surface:#181828;--surface2:#22223a;--surface3:#2a2a45;
-  --text:#e8e8f0;--text2:#a0a0b8;--text3:#6a6a82;
-  --accent:#7c3aed;--accent2:#9333ea;--gold:#c9a84c;
-  --ciencias:#22c55e;--matematicas:#3b82f6;--social:#f97316;
-  --verbal:#0ea5e9;--bienestar:#7c3aed;--descanso:#4b5563;
-  --radius:12px;--radius2:16px;
-  --transition:all .3s cubic-bezier(.4,0,.2,1);
-}
-html{font-size:16px;scroll-behavior:smooth}
-body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;padding-bottom:80px}
-@media(min-width:1024px){body{padding-bottom:0;padding-left:260px}nav{left:0;top:0;width:260px;height:100vh;flex-direction:column;border-right:1px solid var(--surface2);border-bottom:none}}
-
-/* ═══════════════════════════════════════
-   NAVEGACIÓN (3 vistas: Hoy, Semana, Admin)
-   ═══════════════════════════════════════ */
-nav{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-around;background:var(--surface);border-top:1px solid var(--surface2);padding:8px 0;z-index:1000;backdrop-filter:blur(10px)}
-nav button{background:none;border:none;color:var(--text3);font-family:inherit;font-size:.7rem;padding:8px 12px;cursor:pointer;transition:var(--transition);display:flex;flex-direction:column;align-items:center;gap:4px;border-radius:var(--radius)}
-nav button span{font-size:1.4rem}
-nav button:hover,nav button.active{color:var(--accent)}
-nav button.active{background:var(--surface2)}
-
-/* ═══════════════════════════════════════
-   LAYOUT
-   ═══════════════════════════════════════ */
-.view{display:none;padding:20px;max-width:1200px;margin:0 auto;animation:fadeIn .4s ease}
-.view.active{display:block}
-@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(124,58,237,.4)}50%{box-shadow:0 0 0 12px rgba(124,58,237,0)}}
-@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
-@keyframes confetti{0%{transform:translateY(0) rotate(0);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
-@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-@keyframes glow{0%,100%{text-shadow:0 0 10px rgba(124,58,237,.5)}50%{text-shadow:0 0 20px rgba(124,58,237,.8),0 0 30px rgba(201,168,76,.3)}}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-/* ═══════════════════════════════════════
-   HEADER
-   ═══════════════════════════════════════ */
-.header{text-align:center;margin-bottom:24px}
-.header h1{font-size:1.8rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px}
-.header .datetime{color:var(--text2);font-size:.9rem;font-weight:300}
-.header .datetime .time{font-size:1.3rem;font-weight:700;color:var(--text);animation:glow 3s infinite}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
-.stat-card{background:var(--surface);border:1px solid var(--surface2);border-radius:var(--radius);padding:16px;text-align:center;transition:var(--transition)}
-.stat-card:hover{border-color:var(--accent);transform:translateY(-2px)}
-.stat-card .value{font-size:1.8rem;font-weight:800;color:var(--accent)}
-.stat-card .label{font-size:.7rem;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-top:4px}
-.progress-bar{background:var(--surface2);border-radius:20px;height:8px;margin-bottom:24px;overflow:hidden}
-.progress-bar .fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--gold));border-radius:20px;transition:width .5s ease}
-
-/* ═══════════════════════════════════════
-   BLOQUES
-   ═══════════════════════════════════════ */
-.day-selector{display:flex;gap:8px;margin-bottom:20px;overflow-x:auto;padding-bottom:8px;-webkit-overflow-scrolling:touch}
-.day-selector button{background:var(--surface);border:1px solid var(--surface2);color:var(--text2);padding:8px 16px;border-radius:20px;cursor:pointer;font-family:inherit;font-size:.8rem;white-space:nowrap;transition:var(--transition)}
-.day-selector button:hover{border-color:var(--accent)}
-.day-selector button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-.blocks-list{display:flex;flex-direction:column;gap:8px}
-.block{background:var(--surface);border:1px solid var(--surface2);border-radius:var(--radius);padding:12px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:var(--transition);position:relative;overflow:hidden}
-.block:hover{border-color:var(--accent);transform:translateX(4px)}
-.block.active-block{animation:pulse 2s infinite;border-color:var(--accent)}
-.block.completed{opacity:.7;border-left:4px solid var(--ciencias)}
-.block.partial{opacity:.8;border-left:4px solid var(--gold)}
-.block.skipped{opacity:.5;text-decoration:line-through}
-.block .time{font-weight:700;font-size:.9rem;min-width:50px;color:var(--text)}
-.block .info{flex:1}
-.block .info .subject{font-weight:600;font-size:.95rem}
-.block .info .duration{font-size:.75rem;color:var(--text3)}
-.block .status-icon{font-size:1.2rem;min-width:24px;text-align:center}
-.block .cat-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
-.block-actions{display:none;position:absolute;right:12px;top:50%;transform:translateY(-50%);gap:6px}
-.block:hover .block-actions{display:flex}
-.block-actions button{background:var(--surface2);border:none;color:var(--text);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:.9rem;transition:var(--transition)}
-.block-actions button.btn-complete:hover{background:var(--ciencias)}
-.block-actions button.btn-partial:hover{background:var(--gold)}
-.block-actions button.btn-skip:hover{background:#ef4444}
-
-/* ═══════════════════════════════════════
-   VISTA SEMANAL
-   ═══════════════════════════════════════ */
-.week-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;overflow-x:auto;padding-bottom:12px}
-.week-day{background:var(--surface);border:1px solid var(--surface2);border-radius:var(--radius);padding:12px;min-width:0}
-.week-day h3{font-size:.85rem;font-weight:700;margin-bottom:8px;color:var(--accent);text-align:center;padding-bottom:6px;border-bottom:1px solid var(--surface2)}
-.week-day .week-block{background:var(--surface2);border-radius:6px;padding:6px 8px;margin-bottom:4px;font-size:.7rem;display:flex;justify-content:space-between;align-items:center;border-left:3px solid transparent}
-.week-day .week-block .wb-time{color:var(--text3);font-weight:600;min-width:40px}
-.week-day .week-block .wb-subject{color:var(--text);font-weight:500;text-align:right;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-
-/* ═══════════════════════════════════════
-   PANEL ADMIN
-   ═══════════════════════════════════════ */
-.pin-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:20px}
-.pin-screen h2{font-size:1.5rem;color:var(--text)}
-.pin-screen .pin-dots{display:flex;gap:12px}
-.pin-screen .pin-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--accent);transition:var(--transition)}
-.pin-screen .pin-dot.filled{background:var(--accent)}
-.pin-screen .pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.pin-screen .pin-pad button{background:var(--surface);border:1px solid var(--surface2);color:var(--text);width:64px;height:64px;border-radius:50%;font-size:1.3rem;font-weight:600;cursor:pointer;transition:var(--transition);font-family:inherit}
-.pin-screen .pin-pad button:hover{background:var(--accent);border-color:var(--accent)}
-.pin-screen .pin-pad button:active{transform:scale(.95)}
-.pin-screen.shake{animation:shake .5s}
-.pin-screen .pin-error{color:#ef4444;font-size:.85rem;min-height:20px}
-.admin-panel{display:none}
-.admin-panel.visible{display:block}
-.admin-tabs{display:flex;gap:8px;margin-bottom:20px;overflow-x:auto;padding-bottom:8px}
-.admin-tabs button{background:var(--surface);border:1px solid var(--surface2);color:var(--text2);padding:8px 16px;border-radius:var(--radius);cursor:pointer;font-family:inherit;font-size:.8rem;white-space:nowrap;transition:var(--transition)}
-.admin-tabs button:hover{border-color:var(--accent)}
-.admin-tabs button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-.admin-section{display:none;background:var(--surface);border:1px solid var(--surface2);border-radius:var(--radius2);padding:20px}
-.admin-section.active{display:block}
-.admin-section h3{font-size:1.1rem;font-weight:700;margin-bottom:16px;color:var(--accent)}
-.form-group{margin-bottom:16px}
-.form-group label{display:block;font-size:.8rem;color:var(--text2);margin-bottom:6px;font-weight:500}
-.form-group input,.form-group select,.form-group textarea{width:100%;background:var(--surface2);border:1px solid var(--surface3);color:var(--text);padding:10px 14px;border-radius:var(--radius);font-family:inherit;font-size:.9rem;outline:none;transition:var(--transition)}
-.form-group input:focus,.form-group select:focus{border-color:var(--accent)}
-.form-group input[type="color"]{height:44px;padding:4px;cursor:pointer}
-.btn{background:var(--accent);color:#fff;border:none;padding:10px 20px;border-radius:var(--radius);cursor:pointer;font-family:inherit;font-weight:600;font-size:.85rem;transition:var(--transition)}
-.btn:hover{background:var(--accent2);transform:translateY(-1px)}
-.btn-secondary{background:var(--surface2);border:1px solid var(--surface3)}
-.btn-secondary:hover{background:var(--surface3)}
-.btn-danger{background:#ef4444}
-.btn-danger:hover{background:#dc2626}
-.btn-success{background:var(--ciencias)}
-.btn-success:hover{background:#16a34a}
-.btn-group{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
-.editable-table{width:100%;overflow-x:auto;margin-top:12px}
-.editable-table table{width:100%;border-collapse:collapse;font-size:.8rem}
-.editable-table th{background:var(--surface2);color:var(--text2);padding:10px;text-align:left;font-weight:600;position:sticky;top:0}
-.editable-table td{padding:8px 10px;border-bottom:1px solid var(--surface2)}
-.editable-table tr:hover td{background:var(--surface2)}
-.editable-table input,.editable-table select{background:transparent;border:1px solid transparent;color:var(--text);padding:4px 8px;border-radius:4px;font-family:inherit;font-size:.8rem;width:100%}
-.editable-table input:focus,.editable-table select:focus{border-color:var(--accent);background:var(--surface3)}
-.chart-container{background:var(--surface2);border-radius:var(--radius);padding:16px;margin-bottom:16px}
-.chart-container canvas{width:100%!important;height:auto!important}
-.sync-indicator{display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--text3)}
-.sync-dot{width:8px;height:8px;border-radius:50%}
-.sync-dot.green{background:var(--ciencias)}
-.sync-dot.yellow{background:var(--gold)}
-.sync-dot.red{background:#ef4444}
-.confetti-piece{position:fixed;width:10px;height:10px;top:-10px;z-index:9999;animation:confetti 3s ease-out forwards}
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:2000;align-items:center;justify-content:center;padding:20px}
-.modal-overlay.visible{display:flex}
-.modal{background:var(--surface);border:1px solid var(--surface2);border-radius:var(--radius2);padding:24px;max-width:500px;width:100%;max-height:80vh;overflow-y:auto;animation:slideUp .3s ease;position:relative}
-.modal h3{font-size:1.2rem;margin-bottom:16px;color:var(--accent)}
-.modal .close-btn{position:absolute;top:12px;right:16px;background:none;border:none;color:var(--text3);font-size:1.5rem;cursor:pointer}
-.text-center{text-align:center}
-.mt-12{margin-top:12px}
-.mb-12{margin-bottom:12px}
-.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:.7rem;font-weight:600}
-.badge-green{background:rgba(34,197,94,.2);color:var(--ciencias)}
-.badge-blue{background:rgba(59,130,246,.2);color:var(--matematicas)}
-.badge-orange{background:rgba(249,115,22,.2);color:var(--social)}
-.badge-cyan{background:rgba(14,165,233,.2);color:var(--verbal)}
-.badge-purple{background:rgba(124,58,237,.2);color:var(--bienestar)}
-.badge-gray{background:rgba(75,85,99,.2);color:var(--descanso)}
-.loading-spinner{display:inline-block;width:16px;height:16px;border:2px solid var(--surface3);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite}
-::-webkit-scrollbar{width:6px;height:6px}
-::-webkit-scrollbar-track{background:var(--surface)}
-::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:3px}
-::-webkit-scrollbar-thumb:hover{background:var(--accent)}
-@media(max-width:768px){
-  .header h1{font-size:1.4rem}
-  .stats{grid-template-columns:repeat(3,1fr);gap:8px}
-  .stat-card{padding:12px}
-  .stat-card .value{font-size:1.4rem}
-  .week-grid{gap:4px}
-  .week-day{min-width:130px;padding:8px}
-  .admin-tabs{gap:4px}
-  .admin-tabs button{padding:6px 10px;font-size:.7rem}
-}
-@media(max-width:480px){
-  .stats{grid-template-columns:1fr 1fr 1fr}
-  .stat-card .value{font-size:1.2rem}
-  .stat-card .label{font-size:.6rem}
-  .block{padding:10px 12px}
-  .block .time{font-size:.8rem;min-width:42px}
-  .block .info .subject{font-size:.85rem}
-}
-</style>
+<link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════
-     NAVEGACIÓN: 3 VISTAS (sin chat IA)
-     ═══════════════════════════════════════ -->
 <nav id="mainNav">
   <button class="active" data-view="today"><span>📋</span>Hoy</button>
   <button data-view="week"><span>📅</span>Semana</button>
   <button data-view="admin"><span>⚙️</span>Admin</button>
 </nav>
 
-<!-- ═══════════════════════════════════════
-     VISTA 1: HOY
-     ═══════════════════════════════════════ -->
 <div id="view-today" class="view active">
   <div class="header">
     <h1 id="greetingTitle">Mi Agenda de Estudio</h1>
@@ -215,10 +27,11 @@ nav button.active{background:var(--surface2)}
   </div>
   <div class="stats">
     <div class="stat-card"><div class="value" id="statCompleted">0</div><div class="label">Completados</div></div>
-    <div class="stat-card"><div class="value" id="statStreak">0</div><div class="label">Racha días</div></div>
+    <div class="stat-card"><div class="value" id="statStreak">0</div><div class="label">Racha dias</div></div>
     <div class="stat-card"><div class="value" id="statWeekly">0%</div><div class="label">Avance semanal</div></div>
   </div>
   <div class="progress-bar"><div class="fill" id="dayProgress" style="width:0%"></div></div>
+  <div class="pomodoro-bar" id="pomodoroBar"></div>
   <div class="day-selector" id="daySelector"></div>
   <div class="blocks-list" id="blocksList"></div>
   <div class="sync-indicator mt-12">
@@ -227,10 +40,7 @@ nav button.active{background:var(--surface2)}
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════
-     PANTALLA DE SETUP (primera vez)
-     ═══════════════════════════════════════ -->
-<div id="setupScreen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:3000;display:none;align-items:center;justify-content:center;padding:20px">
+<div id="setupScreen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:3000;align-items:center;justify-content:center;padding:20px">
   <div style="max-width:500px;width:100%;text-align:center">
     <div style="font-size:3rem;margin-bottom:16px">📚</div>
     <h1 style="font-size:1.8rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px">Mi Agenda de Estudio</h1>
@@ -239,14 +49,14 @@ nav button.active{background:var(--surface2)}
       <h3 style="font-size:1rem;margin-bottom:16px;color:var(--accent)">📋 Paso 1: Crea tu Google Sheet</h3>
       <ol style="color:var(--text2);font-size:.85rem;line-height:1.8;padding-left:20px;margin-bottom:20px">
         <li>Ve a <a href="https://sheets.google.com" target="_blank" style="color:var(--accent)">sheets.google.com</a> y crea una hoja nueva</li>
-        <li>Crea 4 pestañas: <b>HORARIO</b>, <b>LOGROS</b>, <b>CONFIGURACION</b>, <b>ESTADISTICAS</b></li>
-        <li>En cada pestaña pon los encabezados en la fila 1</li>
+        <li>Crea 4 pestanas: <b>HORARIO</b>, <b>LOGROS</b>, <b>CONFIGURACION</b>, <b>ESTADISTICAS</b></li>
+        <li>En cada pestana pon los encabezados en la fila 1</li>
       </ol>
       <h3 style="font-size:1rem;margin-bottom:16px;color:var(--accent)">⚡ Paso 2: Crea el Apps Script</h3>
       <ol style="color:var(--text2);font-size:.85rem;line-height:1.8;padding-left:20px;margin-bottom:20px">
         <li>En tu Sheet: <b>Extensiones → Apps Script</b></li>
-        <li>Pega el código del script (ver instrucciones en la app)</li>
-        <li>Implementa como <b>Aplicación web</b> → "Cualquier persona"</li>
+        <li>Pega el codigo del script (ver instrucciones en la app)</li>
+        <li>Implementa como <b>Aplicacion web</b> → "Cualquier persona"</li>
       </ol>
       <h3 style="font-size:1rem;margin-bottom:16px;color:var(--accent)">🔗 Paso 3: Pega tu URL</h3>
       <div class="form-group" style="margin-bottom:16px">
@@ -255,25 +65,23 @@ nav button.active{background:var(--surface2)}
       </div>
       <div class="form-group" style="margin-bottom:16px">
         <label style="display:block;font-size:.8rem;color:var(--text2);margin-bottom:6px">Tu nombre</label>
-        <input type="text" id="setupName" placeholder="¿Cómo te llamas?" style="width:100%;background:var(--surface2);border:1px solid var(--surface3);color:var(--text);padding:12px 14px;border-radius:var(--radius);font-family:inherit;font-size:.9rem;outline:none">
+        <input type="text" id="setupName" placeholder="¿Como te llamas?" style="width:100%;background:var(--surface2);border:1px solid var(--surface3);color:var(--text);padding:12px 14px;border-radius:var(--radius);font-family:inherit;font-size:.9rem;outline:none">
       </div>
       <button class="btn" id="setupStart" style="width:100%;padding:14px;font-size:1rem">🚀 Comenzar</button>
     </div>
-    <p style="color:var(--text3);font-size:.75rem;margin-top:16px">¿Ya tienes cuenta? <a href="#" id="setupLogin" style="color:var(--accent)">Iniciar sesión</a></p>
+    <p style="color:var(--text3);font-size:.75rem;margin-top:16px">¿Ya tienes cuenta? <a href="#" id="setupLogin" style="color:var(--accent)">Iniciar sesion</a></p>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════
-     VISTA 2: SEMANA
-     ═══════════════════════════════════════ -->
 <div id="view-week" class="view">
   <div class="header"><h1>Vista Semanal</h1></div>
+  <div class="week-search">
+    <input type="text" id="weekSearchInput" placeholder="Buscar materia o categoria...">
+    <button class="search-clear" id="weekSearchClear">✕</button>
+  </div>
   <div class="week-grid" id="weekGrid"></div>
 </div>
 
-<!-- ═══════════════════════════════════════
-     VISTA 3: ADMIN
-     ═══════════════════════════════════════ -->
 <div id="view-admin" class="view">
   <div class="header"><h1>Panel de Administrador</h1></div>
   <div class="pin-screen" id="pinScreen">
@@ -291,10 +99,9 @@ nav button.active{background:var(--surface2)}
     <div class="admin-tabs">
       <button class="active" data-admin="editor">📝 Editor</button>
       <button data-admin="config">⚙️ Config</button>
-      <button data-admin="stats">📊 Estadísticas</button>
+      <button data-admin="stats">📊 Estadisticas</button>
       <button data-admin="data">💾 Datos</button>
     </div>
-    <!-- EDITOR -->
     <div class="admin-section active" id="sec-editor">
       <h3>Editor de Horario Semanal</h3>
       <div class="btn-group mb-12">
@@ -303,48 +110,45 @@ nav button.active{background:var(--surface2)}
       </div>
       <div class="editable-table" id="scheduleTable"></div>
     </div>
-    <!-- CONFIG -->
     <div class="admin-section" id="sec-config">
-      <h3>Configuración General</h3>
+      <h3>Configuracion General</h3>
       <div class="form-group"><label>Nombre del estudiante</label><input type="text" id="cfgName" value="Estudiante"></div>
-      <div class="form-group"><label>PIN de administrador (4 dígitos)</label><input type="password" id="cfgPin" maxlength="4" pattern="[0-9]{4}"></div>
+      <div class="form-group"><label>PIN de administrador (4 digitos)</label><input type="password" id="cfgPin" maxlength="4" pattern="[0-9]{4}"></div>
       <div class="form-group"><label>URL del Google Apps Script (Web App)</label><input type="url" id="cfgSheetUrl" placeholder="https://script.google.com/macros/s/.../exec"></div>
       <div class="form-group"><label>Spreadsheet ID</label><input type="text" id="cfgSheetId" placeholder="1abc123..."></div>
-      <h3 class="mt-12">Colores por Categoría</h3>
+      <h3 class="mt-12">Colores por Categoria</h3>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
         <div class="form-group"><label>Ciencias</label><input type="color" id="colCiencias" value="#22c55e"></div>
-        <div class="form-group"><label>Matemáticas</label><input type="color" id="colMatematicas" value="#3b82f6"></div>
+        <div class="form-group"><label>Matematicas</label><input type="color" id="colMatematicas" value="#3b82f6"></div>
         <div class="form-group"><label>Social</label><input type="color" id="colSocial" value="#f97316"></div>
         <div class="form-group"><label>Verbal (R.V.)</label><input type="color" id="colVerbal" value="#0ea5e9"></div>
         <div class="form-group"><label>Bienestar</label><input type="color" id="colBienestar" value="#7c3aed"></div>
         <div class="form-group"><label>Descanso/Alimento</label><input type="color" id="colDescanso" value="#4b5563"></div>
       </div>
-      <div class="form-group mt-12"><label>Hora de inicio del día</label><input type="time" id="cfgStartHour" value="04:00"></div>
+      <div class="form-group mt-12"><label>Hora de inicio del dia</label><input type="time" id="cfgStartHour" value="04:00"></div>
       <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:12px">
         <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;cursor:pointer"><input type="checkbox" id="cfgSound" checked> Sonido al completar</label>
         <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;cursor:pointer"><input type="checkbox" id="cfgNotif"> Notificaciones navegador</label>
         <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;cursor:pointer"><input type="checkbox" id="cfgFocus"> Modo Focus</label>
       </div>
-      <div class="btn-group mt-12"><button class="btn" id="btnSaveConfig">💾 Guardar Configuración</button></div>
+      <div class="btn-group mt-12"><button class="btn" id="btnSaveConfig">💾 Guardar Configuracion</button></div>
       <div class="btn-group"><button class="btn btn-danger" id="btnChangeAccount">🔄 Cambiar de cuenta</button></div>
     </div>
-    <!-- ESTADÍSTICAS -->
     <div class="admin-section" id="sec-stats">
-      <h3>Estadísticas Semanales</h3>
+      <h3>Estadisticas Semanales</h3>
       <div class="chart-container"><canvas id="chartSubjects" height="250"></canvas></div>
       <div class="chart-container"><canvas id="chartStreak" height="200"></canvas></div>
       <div id="statsSummary"></div>
-      <div class="btn-group"><button class="btn btn-secondary" id="btnExportReport">📋 Exportar Reporte</button></div>
+      <div class="btn-group"><button class="btn btn-secondary" id="btnExportReport">📋 Exportar Reporte</button><button class="btn btn-secondary" id="btnExportPDF">📄 Exportar PDF</button></div>
     </div>
-    <!-- DATOS -->
     <div class="admin-section" id="sec-data">
-      <h3>Gestión de Datos</h3>
+      <h3>Gestion de Datos</h3>
       <div class="btn-group">
         <button class="btn btn-success" id="btnSyncSheets">🔄 Sincronizar todo</button>
         <button class="btn btn-secondary" id="btnImportSheets">📥 Importar desde Sheets</button>
       </div>
       <div class="btn-group">
-        <button class="btn btn-danger" id="btnClearDay">🗑️ Limpiar día actual</button>
+        <button class="btn btn-danger" id="btnClearDay">🗑️ Limpiar dia actual</button>
         <button class="btn btn-danger" id="btnResetWeek">⚠️ Resetear semana</button>
       </div>
       <div class="btn-group">
@@ -357,9 +161,6 @@ nav button.active{background:var(--surface2)}
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════
-     MODAL DE BLOQUE
-     ═══════════════════════════════════════ -->
 <div class="modal-overlay" id="blockModal">
   <div class="modal">
     <button class="close-btn" id="modalClose">&times;</button>
@@ -370,852 +171,17 @@ nav button.active{background:var(--surface2)}
       <button class="btn" id="modalPartial" style="background:var(--gold)">~ Parcial</button>
       <button class="btn btn-danger" id="modalSkip">✗ Saltado</button>
     </div>
-    <div class="form-group mt-12"><label>Nota (opcional)</label><input type="text" id="modalNote" placeholder="¿Cómo te fue?"></div>
+    <div class="form-group mt-12"><label>Nota (opcional)</label><input type="text" id="modalNote" placeholder="¿Como te fue?"></div>
   </div>
 </div>
 
+<script type="module" src="js/app.js"></script>
 <script>
-/* ═══════════════════════════════════════
-   HORARIO POR DEFECTO
-   ═══════════════════════════════════════ */
-const DEFAULT_SCHEDULE = {
-  lunes:[
-    {time:"04:00",subject:"MEDITAR",dur:30,cat:"bienestar"},
-    {time:"04:30",subject:"R.V.",dur:60,cat:"verbal"},
-    {time:"05:30",subject:"QUÍMICA",dur:60,cat:"ciencias"},
-    {time:"06:30",subject:"R.V.",dur:30,cat:"verbal"},
-    {time:"07:00",subject:"DESAYUNO",dur:30,cat:"descanso"},
-    {time:"07:30",subject:"HISTORIA",dur:50,cat:"social"},
-    {time:"08:20",subject:"CÍVICA",dur:50,cat:"social"},
-    {time:"09:10",subject:"BIOLOGÍA",dur:50,cat:"ciencias"},
-    {time:"10:00",subject:"DESCANSO",dur:10,cat:"descanso"},
-    {time:"10:10",subject:"BIOLOGÍA",dur:40,cat:"ciencias"},
-    {time:"10:50",subject:"BIOLOGÍA",dur:40,cat:"ciencias"},
-    {time:"13:00",subject:"ALMUERZO",dur:30,cat:"descanso"},
-    {time:"13:30",subject:"BIOLOGÍA",dur:30,cat:"ciencias"},
-    {time:"14:00",subject:"BIOLOGÍA",dur:30,cat:"ciencias"},
-    {time:"14:30",subject:"BIOLOGÍA",dur:30,cat:"ciencias"},
-    {time:"15:00",subject:"BIOLOGÍA",dur:30,cat:"ciencias"},
-    {time:"15:30",subject:"DESCANSO",dur:30,cat:"descanso"},
-    {time:"16:00",subject:"HISTORIA",dur:30,cat:"social"},
-    {time:"16:30",subject:"HISTORIA",dur:30,cat:"social"},
-    {time:"17:00",subject:"CÍVICA",dur:30,cat:"social"},
-    {time:"17:30",subject:"CÍVICA",dur:30,cat:"social"},
-    {time:"18:00",subject:"DESCANSO",dur:30,cat:"descanso"},
-    {time:"18:30",subject:"FÍSICA",dur:30,cat:"ciencias"},
-    {time:"19:00",subject:"FÍSICA",dur:30,cat:"ciencias"},
-    {time:"19:30",subject:"BIOLOGÍA",dur:30,cat:"ciencias"},
-    {time:"20:00",subject:"BIOLOGÍA",dur:30,cat:"ciencias"},
-    {time:"20:30",subject:"HISTORIA",dur:30,cat:"social"},
-    {time:"21:00",subject:"HISTORIA",dur:30,cat:"social"},
-    {time:"21:30",subject:"CÍVICA",dur:30,cat:"social"},
-    {time:"22:00",subject:"CÍVICA",dur:30,cat:"social"},
-    {time:"22:30",subject:"MEDITAR",dur:30,cat:"bienestar"}
-  ],
-  martes:[
-    {time:"04:00",subject:"MEDITAR",dur:30,cat:"bienestar"},
-    {time:"04:30",subject:"R.V.",dur:60,cat:"verbal"},
-    {time:"05:30",subject:"QUÍMICA",dur:60,cat:"ciencias"},
-    {time:"06:30",subject:"R.V.",dur:30,cat:"verbal"},
-    {time:"07:00",subject:"DESAYUNO",dur:30,cat:"descanso"},
-    {time:"07:30",subject:"PSICOLOGÍA",dur:50,cat:"social"},
-    {time:"08:20",subject:"COMUNICACIÓN",dur:50,cat:"social"},
-    {time:"09:10",subject:"ANATOMÍA",dur:50,cat:"ciencias"},
-    {time:"10:00",subject:"DESCANSO",dur:10,cat:"descanso"},
-    {time:"10:10",subject:"ANATOMÍA",dur:40,cat:"ciencias"},
-    {time:"10:50",subject:"ANATOMÍA",dur:40,cat:"ciencias"},
-    {time:"13:00",subject:"ALMUERZO",dur:30,cat:"descanso"},
-    {time:"13:30",subject:"ANATOMÍA",dur:30,cat:"ciencias"},
-    {time:"14:00",subject:"ANATOMÍA",dur:30,cat:"ciencias"},
-    {time:"14:30",subject:"ANATOMÍA",dur:30,cat:"ciencias"},
-    {time:"15:00",subject:"ANATOMÍA",dur:30,cat:"ciencias"},
-    {time:"15:30",subject:"DESCANSO",dur:30,cat:"descanso"},
-    {time:"16:00",subject:"PSICOLOGÍA",dur:30,cat:"social"},
-    {time:"16:30",subject:"PSICOLOGÍA",dur:30,cat:"social"},
-    {time:"17:00",subject:"COMUNICACIÓN",dur:30,cat:"social"},
-    {time:"17:30",subject:"COMUNICACIÓN",dur:30,cat:"social"},
-    {time:"18:00",subject:"DESCANSO",dur:30,cat:"descanso"},
-    {time:"18:30",subject:"FÍSICA",dur:30,cat:"ciencias"},
-    {time:"19:00",subject:"FÍSICA",dur:30,cat:"ciencias"},
-    {time:"19:30",subject:"ANATOMÍA",dur:30,cat:"ciencias"},
-    {time:"20:00",subject:"ANATOMÍA",dur:30,cat:"ciencias"},
-    {time:"20:30",subject:"PSICOLOGÍA",dur:30,cat:"social"},
-    {time:"21:00",subject:"PSICOLOGÍA",dur:30,cat:"social"},
-    {time:"21:30",subject:"COMUNICACIÓN",dur:30,cat:"social"},
-    {time:"22:00",subject:"COMUNICACIÓN",dur:30,cat:"social"},
-    {time:"22:30",subject:"MEDITAR",dur:30,cat:"bienestar"}
-  ],
-  miercoles:[
-    {time:"04:00",subject:"MEDITAR",dur:30,cat:"bienestar"},
-    {time:"04:30",subject:"R.V.",dur:60,cat:"verbal"},
-    {time:"05:30",subject:"QUÍMICA",dur:60,cat:"ciencias"},
-    {time:"06:30",subject:"R.V.",dur:30,cat:"verbal"},
-    {time:"07:00",subject:"DESAYUNO",dur:30,cat:"descanso"},
-    {time:"07:30",subject:"FÍSICA",dur:50,cat:"ciencias"},
-    {time:"08:20",subject:"FÍSICA",dur:50,cat:"ciencias"},
-    {time:"09:10",subject:"RM",dur:50,cat:"matematicas"},
-    {time:"10:00",subject:"DESCANSO",dur:10,cat:"descanso"},
-    {time:"10:10",subject:"RM",dur:40,cat:"matematicas"},
-    {time:"10:50",subject:"RM",dur:40,cat:"matematicas"},
-    {time:"13:00",subject:"ALMUERZO",dur:30,cat:"descanso"},
-    {time:"13:30",subject:"QUÍMICA",dur:30,cat:"ciencias"},
-    {time:"14:00",subject:"QUÍMICA",dur:30,cat:"ciencias"},
-    {time:"14:30",subject:"QUÍMICA",dur:30,cat:"ciencias"},
-    {time:"15:00",subject:"QUÍMICA",dur:30,cat:"ciencias"},
-    {time:"15:30",subject:"DESCANSO",dur:30,cat:"descanso"},
-    {time:"16:00",subject:"RM",dur:30,cat:"matematicas"},
-    {time:"16:30",subject:"RM",dur:30,cat:"matematicas"},
-    {time:"17:00",subject:"RM",dur:30,cat:"matematicas"},
-    {time:"17:30",subject:"RM",dur:30,cat:"matematicas"},
-    {time:"18:00",subject:"DESCANSO",dur:30,cat:"descanso"},
-    {time:"18:30",subject:"FÍSICA",dur:30,cat:"ciencias"},
-    {time:"19:00",subject:"FÍSICA",dur:30,cat:"ciencias"},
-    {time:"19:30",subject:"QUÍMICA",dur:30,cat:"ciencias"},
-    {time:"20:00",subject:"QUÍMICA",dur:30,cat:"ciencias"},
-    {time:"20:30",subject:"RM",dur:30,cat:"matematicas"},
-    {time:"21:00",subject:"RM",dur:30,cat:"matematicas"},
-    {time:"21:30",subject:"RM",dur:30,cat:"matematicas"},
-    {time:"22:00",subject:"RM",dur:30,cat:"matematicas"},
-    {time:"22:30",subject:"MEDITAR",dur:30,cat:"bienestar"}
-  ],
-  jueves:[
-    {time:"04:00",subject:"MEDITAR",dur:30,cat:"bienestar"},
-    {time:"04:30",subject:"R.V.",dur:60,cat:"verbal"},
-    {time:"05:30",subject:"QUÍMICA",dur:60,cat:"ciencias"},
-    {time:"06:30",subject:"R.V.",dur:30,cat:"verbal"},
-    {time:"07:00",subject:"DESAYUNO",dur:30,cat:"descanso"},
-    {time:"07:30",subject:"R.V.",dur:50,cat:"verbal"},
-    {time:"08:20",subject:"ECONOMÍA",dur:50,cat:"social"},
-    {time:"09:10",subject:"QUÍMICA",dur:50,cat:"ciencias"},
-    {time:"10:00",subject:"DESCANSO",dur:10,cat:"descanso"},
-    {time:"10:10",subject:"QUÍMICA",dur:40,cat:"ciencias"},
-    {time:"10:50",subject:"QUÍMICA",dur:40,cat:"ciencias"},
-    {time:"13:00",subject:"ALMUERZO",dur:30,cat:"descanso"},
-    {time:"13:30",subject:"ANATOMÍA",dur:30,cat:"ciencias"},
-    {time:"14:00",subject:"ANATOMÍA",dur:30,cat:"ciencias"},
-    {time:"14:30",subject:"ANATOMÍA",dur:30,cat:"ciencias"},
-    {time:"15:00",subject:"ANATOMÍA",dur:30,cat:"ciencias"},
-    {time:"15:30",subject:"DESCANSO",dur:30,cat:"descanso"},
-    {time:"16:00",subject:"R.V.",dur:30,cat:"verbal"},
-    {time:"16:30",subject:"R.V.",dur:30,cat:"verbal"},
-    {time:"17:00",subject:"ECONOMÍA",dur:30,cat:"social"},
-    {time:"17:30",subject:"ECONOMÍA",dur:30,cat:"social"},
-    {time:"18:00",subject:"DESCANSO",dur:30,cat:"descanso"},
-    {time:"18:30",subject:"FÍSICA",dur:30,cat:"ciencias"},
-    {time:"19:00",subject:"FÍSICA",dur:30,cat:"ciencias"},
-    {time:"19:30",subject:"ANATOMÍA",dur:30,cat:"ciencias"},
-    {time:"20:00",subject:"ANATOMÍA",dur:30,cat:"ciencias"},
-    {time:"20:30",subject:"R.V.",dur:30,cat:"verbal"},
-    {time:"21:00",subject:"R.V.",dur:30,cat:"verbal"},
-    {time:"21:30",subject:"ECONOMÍA",dur:30,cat:"social"},
-    {time:"22:00",subject:"ECONOMÍA",dur:30,cat:"social"},
-    {time:"22:30",subject:"MEDITAR",dur:30,cat:"bienestar"}
-  ],
-  viernes:[
-    {time:"04:00",subject:"MEDITAR",dur:30,cat:"bienestar"},
-    {time:"04:30",subject:"R.V.",dur:60,cat:"verbal"},
-    {time:"05:30",subject:"QUÍMICA",dur:60,cat:"ciencias"},
-    {time:"06:30",subject:"R.V.",dur:30,cat:"verbal"},
-    {time:"07:00",subject:"DESAYUNO",dur:30,cat:"descanso"},
-    {time:"07:30",subject:"ARITMÉTICA",dur:50,cat:"matematicas"},
-    {time:"08:20",subject:"ARITMÉTICA",dur:50,cat:"matematicas"},
-    {time:"09:10",subject:"ARITMÉTICA",dur:50,cat:"matematicas"},
-    {time:"10:00",subject:"DESCANSO",dur:10,cat:"descanso"},
-    {time:"10:10",subject:"R.V.",dur:40,cat:"verbal"},
-    {time:"10:50",subject:"R.V.",dur:40,cat:"verbal"},
-    {time:"13:00",subject:"ALMUERZO",dur:30,cat:"descanso"},
-    {time:"13:30",subject:"QUÍMICA",dur:30,cat:"ciencias"},
-    {time:"14:00",subject:"QUÍMICA",dur:30,cat:"ciencias"},
-    {time:"14:30",subject:"QUÍMICA",dur:30,cat:"ciencias"},
-    {time:"15:00",subject:"QUÍMICA",dur:30,cat:"ciencias"},
-    {time:"15:30",subject:"DESCANSO",dur:30,cat:"descanso"},
-    {time:"16:00",subject:"R.V.",dur:30,cat:"verbal"},
-    {time:"16:30",subject:"R.V.",dur:30,cat:"verbal"},
-    {time:"17:00",subject:"ARITMÉTICA",dur:30,cat:"matematicas"},
-    {time:"17:30",subject:"ARITMÉTICA",dur:30,cat:"matematicas"},
-    {time:"18:00",subject:"DESCANSO",dur:30,cat:"descanso"},
-    {time:"18:30",subject:"FÍSICA",dur:30,cat:"ciencias"},
-    {time:"19:00",subject:"FÍSICA",dur:30,cat:"ciencias"},
-    {time:"19:30",subject:"QUÍMICA",dur:30,cat:"ciencias"},
-    {time:"20:00",subject:"QUÍMICA",dur:30,cat:"ciencias"},
-    {time:"20:30",subject:"R.V.",dur:30,cat:"verbal"},
-    {time:"21:00",subject:"R.V.",dur:30,cat:"verbal"},
-    {time:"21:30",subject:"ARITMÉTICA",dur:30,cat:"matematicas"},
-    {time:"22:00",subject:"ARITMÉTICA",dur:30,cat:"matematicas"},
-    {time:"22:30",subject:"MEDITAR",dur:30,cat:"bienestar"}
-  ],
-  sabado:[
-    {time:"04:00",subject:"MEDITAR",dur:30,cat:"bienestar"},
-    {time:"04:30",subject:"R.V.",dur:60,cat:"verbal"},
-    {time:"05:30",subject:"QUÍMICA",dur:60,cat:"ciencias"},
-    {time:"06:30",subject:"R.V.",dur:30,cat:"verbal"},
-    {time:"07:00",subject:"DESAYUNO",dur:30,cat:"descanso"},
-    {time:"11:40",subject:"DESCANSO",dur:80,cat:"descanso"},
-    {time:"13:00",subject:"ALMUERZO",dur:90,cat:"descanso"}
-  ],
-  domingo:[
-    {time:"04:00",subject:"MEDITAR",dur:30,cat:"bienestar"},
-    {time:"04:30",subject:"R.V.",dur:60,cat:"verbal"},
-    {time:"05:30",subject:"QUÍMICA",dur:60,cat:"ciencias"},
-    {time:"06:30",subject:"R.V.",dur:30,cat:"verbal"},
-    {time:"07:00",subject:"DESAYUNO",dur:30,cat:"descanso"},
-    {time:"11:40",subject:"DESCANSO",dur:80,cat:"descanso"},
-    {time:"13:00",subject:"ALMUERZO",dur:90,cat:"descanso"}
-  ]
-};
-
-const DAYS_ES=['domingo','lunes','martes','miercoles','jueves','viernes','sabado'];
-const DAYS_LABEL=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-const CAT_COLORS={ciencias:'#22c55e',matematicas:'#3b82f6',social:'#f97316',verbal:'#0ea5e9',bienestar:'#7c3aed',descanso:'#4b5563'};
-const CAT_BADGES={ciencias:'badge-green',matematicas:'badge-blue',social:'badge-orange',verbal:'badge-cyan',bienestar:'badge-purple',descanso:'badge-gray'};
-
-/* ═══════════════════════════════════════
-   ESTADO
-   ═══════════════════════════════════════ */
-let state={
-  schedule:{},
-  logs:{},
-  config:{name:'Estudiante',pin:'1234',sheetUrl:'',sheetId:'',colors:{...CAT_COLORS},startHour:'04:00',sound:true,notifications:false,focus:false},
-  streak:0,
-  selectedDay:'',
-  selectedBlock:null,
-  pinInput:'',
-  adminAuthenticated:false,
-  syncStatus:'yellow'
-};
-
-/* ═══════════════════════════════════════
-   GOOGLE SHEETS API
-   ═══════════════════════════════════════ */
-async function sheetsCall(accion, hoja, datos, extra={}) {
-  if (!state.config.sheetUrl) return {success:false, error:'Sin URL configurada'};
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 15000);
-  try {
-    const body = {accion, hoja};
-    if (datos) body.datos = datos;
-    Object.assign(body, extra);
-    const resp = await fetch(state.config.sheetUrl, {
-      method:'POST',
-      headers:{'Content-Type':'text/plain;charset=utf-8'},
-      body: JSON.stringify(body),
-      signal: controller.signal
-    });
-    clearTimeout(timeout);
-    const result = await resp.json();
-    return result;
-  } catch(e) {
-    clearTimeout(timeout);
-    return {success:false, error:e.message};
-  }
-}
-
-async function syncToSheets() {
-  if (!state.config.sheetUrl) { updateSyncStatus('red','Sin Sheets'); return; }
-  updateSyncStatus('yellow','Sincronizando...');
-  addSyncLog('Enviando horario a Sheets...');
-
-  // Enviar HORARIO completo
-  const horarioData = [];
-  DAYS_ES.forEach(day => {
-    (state.schedule[day]||[]).forEach(b => {
-      horarioData.push({dia:day, hora:b.time, materia:b.subject, duracion_min:b.dur, categoria:b.cat});
-    });
-  });
-  const r1 = await sheetsCall('escribir','HORARIO',horarioData);
-  if (!r1.success) { addSyncLog('Error HORARIO: '+r1.error); updateSyncStatus('red','Error'); return; }
-  addSyncLog('✅ HORARIO enviado ('+horarioData.length+' bloques)');
-
-  // Enviar LOGROS del día
-  const dayKey = getTodayKey();
-  const logs = state.logs[dayKey] || [];
-  if (logs.length > 0) {
-    const logData = logs.map(l => ({fecha:dayKey, dia:getCurrentDayName(), hora:l.time, materia:l.subject, status:l.status, nota:l.note||'', timestamp:l.timestamp||Date.now()}));
-    const r2 = await sheetsCall('escribir','LOGROS',logData);
-    if (r2.success) addSyncLog('✅ LOGROS enviados ('+logData.length+')');
-    else addSyncLog('Error LOGROS: '+r2.error);
-  }
-
-  // Enviar CONFIG
-  const r3 = await sheetsCall('actualizar','CONFIGURACION',null,{clave:'nombre_estudiante',valor:state.config.name});
-  const r4 = await sheetsCall('actualizar','CONFIGURACION',null,{clave:'pin_admin',valor:state.config.pin});
-  const r5 = await sheetsCall('actualizar','CONFIGURACION',null,{clave:'hora_inicio',valor:state.config.startHour});
-  const r6 = await sheetsCall('actualizar','CONFIGURACION',null,{clave:'colores_json',valor:JSON.stringify(state.config.colors)});
-
-  updateSyncStatus('green','Sincronizado');
-  addSyncLog('✅ Sincronización completa');
-}
-
-async function importFromSheets() {
-  if (!state.config.sheetUrl) { alert('Configura la URL primero'); return; }
-  addSyncLog('Importando desde Sheets...');
-  updateSyncStatus('yellow','Importando...');
-
-  const r1 = await sheetsCall('leer','HORARIO');
-  if (r1.success && r1.data && r1.data.length > 0) {
-    const sched = {};
-    r1.data.forEach(row => {
-      const day = row.dia || row['dia'];
-      if (!day) return;
-      if (!sched[day]) sched[day] = [];
-      sched[day].push({
-        time: row.hora || row['hora'] || '00:00',
-        subject: row.materia || row['materia'] || '',
-        dur: parseInt(row.duracion_min || row['duracion_min'] || 30),
-        cat: row.categoria || row['categoria'] || 'ciencias'
-      });
-    });
-    state.schedule = sched;
-    addSyncLog('✅ Horario importado ('+r1.data.length+' bloques)');
-  } else {
-    addSyncLog('No se encontró HORARIO en Sheets');
-  }
-
-  const r2 = await sheetsCall('leer','CONFIGURACION');
-  if (r2.success && r2.data) {
-    r2.data.forEach(row => {
-      const key = row.clave || row['clave'];
-      const val = row.valor || row['valor'];
-      if (key === 'nombre_estudiante') state.config.name = val;
-      if (key === 'pin_admin') state.config.pin = val;
-      if (key === 'hora_inicio') state.config.startHour = val;
-      if (key === 'colores_json') state.config.colors = JSON.parse(val);
-    });
-    addSyncLog('✅ Configuración importada');
-  }
-
-  const r3 = await sheetsCall('leer','LOGROS');
-  if (r3.success && r3.data) {
-    const logsByDate = {};
-    r3.data.forEach(row => {
-      const fecha = row.fecha || row['fecha'];
-      if (!fecha) return;
-      if (!logsByDate[fecha]) logsByDate[fecha] = [];
-      logsByDate[fecha].push({
-        time: row.hora || row['hora'],
-        subject: row.materia || row['materia'],
-        status: row.status || row['status'],
-        note: row.nota || row['nota'] || null,
-        timestamp: row.timestamp || row['timestamp'] || Date.now()
-      });
-    });
-    state.logs = {...state.logs, ...logsByDate};
-    addSyncLog('✅ Logros importados ('+r3.data.length+' registros)');
-  }
-
-  saveState();
-  updateSyncStatus('green','Importado');
-  renderTodayView();
-  alert('✅ Datos importados desde Google Sheets');
-}
-
-/* ═══════════════════════════════════════
-   PERSISTENCIA LOCAL
-   ═══════════════════════════════════════ */
-function saveState(){localStorage.setItem('agenda_state',JSON.stringify({schedule:state.schedule,logs:state.logs,config:state.config,streak:state.streak}))}
-function loadState(){
-  const s=localStorage.getItem('agenda_state');
-  if(s){const d=JSON.parse(s);state.schedule=d.schedule||DEFAULT_SCHEDULE;state.logs=d.logs||{};state.config={...state.config,...d.config};state.streak=d.streak||0}
-  else state.schedule=JSON.parse(JSON.stringify(DEFAULT_SCHEDULE));
-}
-
-/* ═══════════════════════════════════════
-   UTILIDADES
-   ═══════════════════════════════════════ */
-function getTodayKey(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
-function getCurrentDayName(){return DAYS_ES[new Date().getDay()]}
-function getCurrentTime(){const n=new Date();return String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')}
-function timeToMin(t){
-  // Si viene como fecha ISO de Sheets (1899-12-30T09:08:36.000Z), extraer hora
-  if(t.includes('T')){const d=new Date(t);return d.getUTCHours()*60+d.getUTCMinutes()}
-  const[h,m]=t.split(':').map(Number);return h*60+m
-}
-function sheetTimeToHHMM(t){
-  // Convertir fecha ISO de Sheets a HH:MM
-  if(t.includes('T')){const d=new Date(t);return String(d.getUTCHours()).padStart(2,'0')+':'+String(d.getUTCMinutes()).padStart(2,'0')}
-  return t;
-}
-function getDayLogs(k){return state.logs[k]||[]}
-function getBlockStatus(dk,time,subj){const l=getDayLogs(dk);const f=l.find(x=>x.time===time&&x.subject===subj);return f?f.status:null}
-function setBlockStatus(dk,time,subj,status,note){
-  if(!state.logs[dk])state.logs[dk]=[];
-  const idx=state.logs[dk].findIndex(x=>x.time===time&&x.subject===subj);
-  const entry={time,subject:subj,status,note:note||null,timestamp:Date.now()};
-  if(idx>=0)state.logs[dk][idx]=entry;else state.logs[dk].push(entry);
-  saveState();
-  // Auto-sync a Sheets
-  sheetsCall('escribir','LOGROS',[{fecha:dk,dia:getCurrentDayName(),hora:time,materia:subj,status,note:note||'',timestamp:entry.timestamp}]);
-}
-function getDayTotalMinutes(dk){
-  const logs=getDayLogs(dk);const dayName=getCurrentDayName();const blocks=state.schedule[dayName]||[];let mins=0;
-  logs.forEach(l=>{if(l.status==='completado'||l.status==='parcial'){const b=blocks.find(bl=>bl.time===l.time&&bl.subject===l.subject);mins+=b?(l.status==='completado'?b.dur:Math.round(b.dur*0.5)):0}});
-  return mins;
-}
-function getDayCompletedCount(dk){return getDayLogs(dk).filter(l=>l.status==='completado').length}
-function getDaySkippedCount(dk){return getDayLogs(dk).filter(l=>l.status==='saltado').length}
-function playBeep(){
-  if(!state.config.sound)return;
-  try{const c=new(window.AudioContext||window.webkitAudioContext)();const o=c.createOscillator();const g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=800;g.gain.value=0.1;o.start();o.stop(c.currentTime+0.15)}catch(e){}
-}
-function showConfetti(){
-  const colors=['#7c3aed','#c9a84c','#22c55e','#3b82f6','#f97316','#0ea5e9'];
-  for(let i=0;i<60;i++){const el=document.createElement('div');el.className='confetti-piece';el.style.left=Math.random()*100+'vw';el.style.background=colors[Math.floor(Math.random()*colors.length)];el.style.animationDuration=(2+Math.random()*2)+'s';el.style.animationDelay=Math.random()*0.5+'s';el.style.borderRadius=Math.random()>.5?'50%':'2px';el.style.width=(6+Math.random()*8)+'px';el.style.height=(6+Math.random()*8)+'px';document.body.appendChild(el);setTimeout(()=>el.remove(),4000)}
-}
-function addSyncLog(msg){const log=document.getElementById('syncLog');if(!log)return;const t=new Date().toLocaleString('es');log.innerHTML=`<div style="margin-bottom:4px">[${t}] ${msg}</div>`+log.innerHTML}
-function updateSyncStatus(status,text){
-  state.syncStatus=status;
-  const dot=document.getElementById('syncDot');const txt=document.getElementById('syncText');
-  if(!dot)return;
-  dot.className='sync-dot '+status;
-  txt.textContent=text||(status==='green'?'Sincronizado':status==='yellow'?'Pendiente':'Sin conexión');
-}
-
-/* ═══════════════════════════════════════
-   NAVEGACIÓN
-   ═══════════════════════════════════════ */
-document.querySelectorAll('#mainNav button').forEach(btn=>{
-  btn.addEventListener('click',()=>{
-    document.querySelectorAll('#mainNav button').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-    document.getElementById('view-'+btn.dataset.view).classList.add('active');
-    if(btn.dataset.view==='week')renderWeekView();
-    if(btn.dataset.view==='admin')renderAdmin();
-  });
-});
-
-/* ═══════════════════════════════════════
-   RELOJ
-   ═══════════════════════════════════════ */
-function updateClock(){
-  const now=new Date();
-  document.getElementById('currentDate').textContent=now.toLocaleDateString('es-ES',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  document.getElementById('currentTime').textContent=now.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-}
-setInterval(updateClock,1000);updateClock();
-
-/* ═══════════════════════════════════════
-   RENDER: HOY
-   ═══════════════════════════════════════ */
-function renderTodayView(){
-  const dayName=state.selectedDay||getCurrentDayName();
-  const dayKey=getTodayKey();
-  const blocks=state.schedule[dayName]||[];
-  const now=getCurrentTime();const nowMin=timeToMin(now);
-
-  // Selector de día
-  const sel=document.getElementById('daySelector');
-  sel.innerHTML='';
-  DAYS_ES.forEach((d,i)=>{
-    if(d==='domingo')return;
-    const btn=document.createElement('button');
-    btn.textContent=DAYS_LABEL[i]||d.substring(0,3);
-    btn.className=d===dayName?'active':'';
-    btn.addEventListener('click',()=>{state.selectedDay=d;renderTodayView()});
-    sel.appendChild(btn);
-  });
-
-  // Stats
-  const completed=getDayCompletedCount(dayKey);
-  const total=blocks.length;
-  const pct=total>0?Math.round(completed/total*100):0;
-  document.getElementById('statCompleted').textContent=completed;
-  document.getElementById('statStreak').textContent=state.streak;
-  document.getElementById('statWeekly').textContent=pct+'%';
-  document.getElementById('dayProgress').style.width=pct+'%';
-  document.getElementById('greetingTitle').textContent=`Hola, ${state.config.name}`;
-
-  // Bloques
-  const list=document.getElementById('blocksList');
-  list.innerHTML='';
-  blocks.forEach(b=>{
-    const status=getBlockStatus(dayKey,b.time,b.subject);
-    const blockMin=timeToMin(b.time);const endMin=blockMin+b.dur;
-    const isActive=nowMin>=blockMin&&nowMin<endMin;
-    const statusClass=status==='completado'?'completed':status==='parcial'?'partial':status==='saltado'?'skipped':'';
-    const statusIcon=status==='completado'?'✓':status==='parcial'?'~':status==='saltado'?'✗':'';
-    const color=state.config.colors[b.cat]||CAT_COLORS[b.cat]||'#888';
-
-    const el=document.createElement('div');
-    el.className=`block ${statusClass} ${isActive?'active-block':''}`;
-    el.innerHTML=`
-      <div class="cat-dot" style="background:${color}"></div>
-      <div class="time">${b.time}</div>
-      <div class="info">
-        <div class="subject">${isActive?'<span class="badge badge-purple" style="margin-right:6px">▶ AHORA</span>':''}${b.subject}</div>
-        <div class="duration">${b.dur} min · <span class="badge ${CAT_BADGES[b.cat]||''}">${b.cat}</span></div>
-      </div>
-      <div class="status-icon">${statusIcon}</div>
-      <div class="block-actions">
-        <button class="btn-complete" title="Completado">✓</button>
-        <button class="btn-partial" title="Parcial">~</button>
-        <button class="btn-skip" title="Saltado">✗</button>
-      </div>`;
-
-    el.addEventListener('click',(e)=>{if(!e.target.closest('.block-actions'))openBlockModal(b,dayKey,dayName)});
-    el.querySelector('.btn-complete').addEventListener('click',(e)=>{e.stopPropagation();setBlockStatus(dayKey,b.time,b.subject,'completado',null);playBeep();renderTodayView();checkAllCompleted(dayKey,dayName)});
-    el.querySelector('.btn-partial').addEventListener('click',(e)=>{e.stopPropagation();setBlockStatus(dayKey,b.time,b.subject,'parcial',null);renderTodayView()});
-    el.querySelector('.btn-skip').addEventListener('click',(e)=>{e.stopPropagation();setBlockStatus(dayKey,b.time,b.subject,'saltado',null);renderTodayView();checkSkippedAlert(dayKey,dayName)});
-    list.appendChild(el);
-  });
-
-  const ab=list.querySelector('.active-block');
-  if(ab)ab.scrollIntoView({behavior:'smooth',block:'center'});
-}
-
-function checkAllCompleted(dk,dn){
-  const blocks=state.schedule[dn]||[];const logs=getDayLogs(dk);
-  const allDone=blocks.every(b=>{if(b.cat==='descanso')return true;return logs.find(l=>l.time===b.time&&l.subject===b.subject&&(l.status==='completado'||l.status==='parcial'))});
-  if(allDone&&blocks.length>5)showConfetti();
-}
-
-function checkSkippedAlert(dk,dn){
-  const skipped=getDaySkippedCount(dk);
-  if(skipped>2){
-    const blocks=state.schedule[dn]||[];const now=getCurrentTime();const nowMin=timeToMin(now);
-    const next=blocks.find(b=>timeToMin(b.time)>nowMin&&b.cat!=='descanso');
-    alert(`⚠️ Llevas ${skipped} bloques sin completar. Tu próxima ventana de recuperación es ${next?next.time:'mañana'}. ¿Quieres ajustar el plan?`);
-  }
-}
-
-/* ═══════════════════════════════════════
-   MODAL
-   ═══════════════════════════════════════ */
-function openBlockModal(block,dk,dn){
-  state.selectedBlock={block,dk,dn};
-  document.getElementById('modalTitle').textContent=block.subject;
-  document.getElementById('modalInfo').textContent=`${block.time} · ${block.dur} min · ${dn.charAt(0).toUpperCase()+dn.slice(1)}`;
-  document.getElementById('modalNote').value='';
-  document.getElementById('blockModal').classList.add('visible');
-}
-document.getElementById('modalClose').addEventListener('click',()=>{document.getElementById('blockModal').classList.remove('visible');state.selectedBlock=null});
-document.getElementById('modalComplete').addEventListener('click',()=>{
-  if(!state.selectedBlock)return;const{block,dk,dn}=state.selectedBlock;
-  setBlockStatus(dk,block.time,block.subject,'completado',document.getElementById('modalNote').value);
-  playBeep();document.getElementById('blockModal').classList.remove('visible');renderTodayView();checkAllCompleted(dk,dn);state.selectedBlock=null;
-});
-document.getElementById('modalPartial').addEventListener('click',()=>{
-  if(!state.selectedBlock)return;const{block,dk}=state.selectedBlock;
-  setBlockStatus(dk,block.time,block.subject,'parcial',document.getElementById('modalNote').value);
-  document.getElementById('blockModal').classList.remove('visible');renderTodayView();state.selectedBlock=null;
-});
-document.getElementById('modalSkip').addEventListener('click',()=>{
-  if(!state.selectedBlock)return;const{block,dk,dn}=state.selectedBlock;
-  setBlockStatus(dk,block.time,block.subject,'saltado',document.getElementById('modalNote').value);
-  document.getElementById('blockModal').classList.remove('visible');renderTodayView();checkSkippedAlert(dk,dn);state.selectedBlock=null;
-});
-
-/* ═══════════════════════════════════════
-   RENDER: SEMANA
-   ═══════════════════════════════════════ */
-function renderWeekView(){
-  const grid=document.getElementById('weekGrid');grid.innerHTML='';
-  DAYS_ES.forEach((day,i)=>{
-    if(day==='domingo')return;
-    const blocks=state.schedule[day]||[];
-    const col=document.createElement('div');col.className='week-day';
-    col.innerHTML=`<h3>${DAYS_LABEL[i]||day}</h3>`;
-    blocks.forEach(b=>{
-      const color=state.config.colors[b.cat]||CAT_COLORS[b.cat]||'#888';
-      col.innerHTML+=`<div class="week-block" style="border-left-color:${color}"><span class="wb-time">${b.time}</span><span class="wb-subject">${b.subject}</span></div>`;
-    });
-    grid.appendChild(col);
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
   });
 }
-
-/* ═══════════════════════════════════════
-   ADMIN: PIN
-   ═══════════════════════════════════════ */
-document.querySelectorAll('#pinPad button').forEach(btn=>{
-  btn.addEventListener('click',()=>{
-    const v=btn.dataset.pin;
-    if(v==='clear')state.pinInput='';
-    else if(v==='del')state.pinInput=state.pinInput.slice(0,-1);
-    else{if(state.pinInput.length<4)state.pinInput+=v}
-    updatePinDots();
-    if(state.pinInput.length===4)checkPin();
-  });
-});
-function updatePinDots(){document.querySelectorAll('#pinDots .pin-dot').forEach((d,i)=>d.classList.toggle('filled',i<state.pinInput.length))}
-function checkPin(){
-  if(state.pinInput===state.config.pin){
-    state.adminAuthenticated=true;
-    document.getElementById('pinScreen').style.display='none';
-    document.getElementById('adminPanel').classList.add('visible');
-    renderAdminEditor();renderAdminConfig();
-  }else{
-    const s=document.getElementById('pinScreen');s.classList.add('shake');
-    document.getElementById('pinError').textContent='PIN incorrecto';
-    setTimeout(()=>{s.classList.remove('shake');document.getElementById('pinError').textContent=''},600);
-    state.pinInput='';updatePinDots();
-  }
-}
-
-/* ═══════════════════════════════════════
-   ADMIN TABS
-   ═══════════════════════════════════════ */
-document.querySelectorAll('.admin-tabs button').forEach(btn=>{
-  btn.addEventListener('click',()=>{
-    document.querySelectorAll('.admin-tabs button').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    document.querySelectorAll('.admin-section').forEach(s=>s.classList.remove('active'));
-    document.getElementById('sec-'+btn.dataset.admin).classList.add('active');
-    if(btn.dataset.admin==='stats')renderStats();
-  });
-});
-
-/* ═══════════════════════════════════════
-   ADMIN: EDITOR
-   ═══════════════════════════════════════ */
-function renderAdminEditor(){
-  const c=document.getElementById('scheduleTable');
-  let h='<table><thead><tr><th>Día</th><th>Hora</th><th>Materia</th><th>Dur.</th><th>Categoría</th><th></th></tr></thead><tbody>';
-  DAYS_ES.forEach(day=>{
-    if(day==='domingo')return;
-    (state.schedule[day]||[]).forEach((b,i)=>{
-      h+=`<tr data-day="${day}" data-idx="${i}">
-        <td><input value="${day}" readonly style="opacity:.6"></td>
-        <td><input type="time" value="${b.time}" class="inp-time"></td>
-        <td><input value="${b.subject}" class="inp-subject"></td>
-        <td><input type="number" value="${b.dur}" class="inp-dur" min="5" max="180" step="5"></td>
-        <td><select class="inp-cat">${Object.keys(CAT_COLORS).map(c=>`<option value="${c}" ${c===b.cat?'selected':''}>${c}</option>`).join('')}</select></td>
-        <td><button class="btn btn-danger" style="padding:4px 8px;font-size:.7rem" onclick="deleteBlock('${day}',${i})">✗</button></td>
-      </tr>`;
-    });
-  });
-  h+='</tbody></table>';c.innerHTML=h;
-}
-window.deleteBlock=function(day,idx){state.schedule[day].splice(idx,1);saveState();renderAdminEditor()};
-
-document.getElementById('btnAddBlock').addEventListener('click',()=>{
-  const day=getCurrentDayName();
-  state.schedule[day].push({time:'12:00',subject:'NUEVO',dur:30,cat:'ciencias'});
-  saveState();renderAdminEditor();
-});
-
-document.getElementById('btnSaveSchedule').addEventListener('click',async()=>{
-  document.querySelectorAll('#scheduleTable tbody tr').forEach(tr=>{
-    const day=tr.querySelector('input').value;
-    const time=tr.querySelector('.inp-time').value;
-    const subject=tr.querySelector('.inp-subject').value;
-    const dur=parseInt(tr.querySelector('.inp-dur').value);
-    const cat=tr.querySelector('.inp-cat').value;
-    const idx=parseInt(tr.dataset.idx);
-    if(state.schedule[day]&&state.schedule[day][idx])state.schedule[day][idx]={time,subject,dur,cat};
-  });
-  saveState();
-  addSyncLog('Horario guardado localmente');
-  // Enviar a Sheets
-  if(state.config.sheetUrl){
-    addSyncLog('Enviando a Google Sheets...');
-    const r=await syncToSheets();
-    if(r&&r.success)alert('✅ Guardado en Google Sheets');
-    else alert('⚠️ Guardado local. Error Sheets: '+(r?r.error:'Sin URL'));
-  }else{
-    alert('✅ Horario guardado (local). Configura Sheets en Admin > Config para backup en la nube.');
-  }
-  renderTodayView();
-});
-
-/* ═══════════════════════════════════════
-   ADMIN: CONFIG
-   ═══════════════════════════════════════ */
-function renderAdminConfig(){
-  document.getElementById('cfgName').value=state.config.name;
-  document.getElementById('cfgPin').value=state.config.pin;
-  document.getElementById('cfgSheetUrl').value=state.config.sheetUrl;
-  document.getElementById('cfgSheetId').value=state.config.sheetId;
-  document.getElementById('colCiencias').value=state.config.colors.ciencias||CAT_COLORS.ciencias;
-  document.getElementById('colMatematicas').value=state.config.colors.matematicas||CAT_COLORS.matematicas;
-  document.getElementById('colSocial').value=state.config.colors.social||CAT_COLORS.social;
-  document.getElementById('colVerbal').value=state.config.colors.verbal||CAT_COLORS.verbal;
-  document.getElementById('colBienestar').value=state.config.colors.bienestar||CAT_COLORS.bienestar;
-  document.getElementById('colDescanso').value=state.config.colors.descanso||CAT_COLORS.descanso;
-  document.getElementById('cfgStartHour').value=state.config.startHour;
-  document.getElementById('cfgSound').checked=state.config.sound;
-  document.getElementById('cfgNotif').checked=state.config.notifications;
-  document.getElementById('cfgFocus').checked=state.config.focus;
-}
-
-document.getElementById('btnSaveConfig').addEventListener('click',()=>{
-  state.config.name=document.getElementById('cfgName').value;
-  const np=document.getElementById('cfgPin').value;if(/^\d{4}$/.test(np))state.config.pin=np;
-  state.config.sheetUrl=document.getElementById('cfgSheetUrl').value;
-  state.config.sheetId=document.getElementById('cfgSheetId').value;
-  state.config.colors={ciencias:document.getElementById('colCiencias').value,matematicas:document.getElementById('colMatematicas').value,social:document.getElementById('colSocial').value,verbal:document.getElementById('colVerbal').value,bienestar:document.getElementById('colBienestar').value,descanso:document.getElementById('colDescanso').value};
-  state.config.startHour=document.getElementById('cfgStartHour').value;
-  state.config.sound=document.getElementById('cfgSound').checked;
-  state.config.notifications=document.getElementById('cfgNotif').checked;
-  state.config.focus=document.getElementById('cfgFocus').checked;
-  saveState();addSyncLog('Configuración guardada');alert('✅ Configuración guardada');renderTodayView();
-});
-
-/* ═══════════════════════════════════════
-   ADMIN: ESTADÍSTICAS
-   ═══════════════════════════════════════ */
-function renderStats(){
-  const sc={};const today=new Date();
-  for(let i=0;i<7;i++){
-    const d=new Date(today);d.setDate(d.getDate()-i);
-    const key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-    const dn=DAYS_ES[d.getDay()];const blocks=state.schedule[dn]||[];const logs=state.logs[key]||[];
-    logs.forEach(l=>{
-      if(l.status==='completado'||l.status==='parcial'){
-        const b=blocks.find(bl=>bl.time===l.time&&bl.subject===l.subject);
-        if(b)sc[l.subject]=(sc[l.subject]||0)+(l.status==='completado'?b.dur:Math.round(b.dur*0.5));
-      }
-    });
-  }
-  drawBarChart(sc);drawStreakChart();renderStatsSummary(sc);
-}
-
-function drawBarChart(data){
-  const canvas=document.getElementById('chartSubjects');const ctx=canvas.getContext('2d');
-  canvas.width=canvas.parentElement.clientWidth-32;
-  const entries=Object.entries(data).sort((a,b)=>b[1]-a[1]).slice(0,10);
-  if(!entries.length){ctx.fillStyle='#6a6a82';ctx.font='14px Sora';ctx.textAlign='center';ctx.fillText('Sin datos esta semana',canvas.width/2,canvas.height/2);return}
-  const max=Math.max(...entries.map(e=>e[1]));const barW=Math.min(40,(canvas.width-60)/entries.length-8);const cH=canvas.height-50;
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  entries.forEach(([s,m],i)=>{const x=30+i*(barW+8);const h=(m/max)*cH;const y=canvas.height-30-h;ctx.fillStyle=getSubjectColor(s);ctx.fillRect(x,y,barW,h);ctx.fillStyle='#a0a0b8';ctx.font='9px Sora';ctx.textAlign='center';ctx.fillText(s.substring(0,6),x+barW/2,canvas.height-16);ctx.fillStyle='#e8e8f0';ctx.fillText((m/60).toFixed(1)+'h',x+barW/2,y-6)});
-}
-
-function getSubjectColor(s){
-  const u=s.toUpperCase();
-  if(['BIOLOGÍA','QUÍMICA','FÍSICA','ANATOMÍA'].some(m=>u.includes(m)))return state.config.colors.ciencias||CAT_COLORS.ciencias;
-  if(['RM','ARITMÉTICA'].some(m=>u.includes(m)))return state.config.colors.matematicas||CAT_COLORS.matematicas;
-  if(u.includes('R.V.'))return state.config.colors.verbal||CAT_COLORS.verbal;
-  if(u.includes('MEDITAR'))return state.config.colors.bienestar||CAT_COLORS.bienestar;
-  return state.config.colors.social||CAT_COLORS.social;
-}
-
-function drawStreakChart(){
-  const canvas=document.getElementById('chartStreak');const ctx=canvas.getContext('2d');
-  canvas.width=canvas.parentElement.clientWidth-32;
-  const days=7;const data=[];const today=new Date();
-  for(let i=days-1;i>=0;i--){
-    const d=new Date(today);d.setDate(d.getDate()-i);
-    const key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-    const dn=DAYS_ES[d.getDay()];const blocks=state.schedule[dn]||[];const logs=state.logs[key]||[];
-    const comp=logs.filter(l=>l.status==='completado').length;
-    data.push({day:DAYS_LABEL[d.getDay()]||'',pct:blocks.length>0?Math.round(comp/blocks.length*100):0});
-  }
-  const cW=canvas.width-60;const cH=canvas.height-50;ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.beginPath();ctx.strokeStyle='#7c3aed';ctx.lineWidth=2;
-  data.forEach((d,i)=>{const x=30+(i/(days-1))*cW;const y=canvas.height-30-(d.pct/100)*cH;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)});
-  ctx.stroke();
-  data.forEach((d,i)=>{const x=30+(i/(days-1))*cW;const y=canvas.height-30-(d.pct/100)*cH;ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fillStyle='#7c3aed';ctx.fill();ctx.fillStyle='#a0a0b8';ctx.font='10px Sora';ctx.textAlign='center';ctx.fillText(d.day,x,canvas.height-14);ctx.fillStyle='#e8e8f0';ctx.fillText(d.pct+'%',x,y-10)});
-}
-
-function renderStatsSummary(data){
-  const c=document.getElementById('statsSummary');const entries=Object.entries(data).sort((a,b)=>b[1]-a[1]);
-  let h='<table style="width:100%;font-size:.85rem"><thead><tr><th>Materia</th><th>Minutos</th><th>Horas</th></tr></thead><tbody>';
-  entries.forEach(([s,m])=>{h+=`<tr><td>${s}</td><td>${m}</td><td>${(m/60).toFixed(1)}</td></tr>`});
-  h+='</tbody></table>';c.innerHTML=h;
-}
-
-document.getElementById('btnExportReport').addEventListener('click',()=>{
-  const dk=getTodayKey();const dn=getCurrentDayName();const blocks=state.schedule[dn]||[];const logs=getDayLogs(dk);
-  let t=`📊 REPORTE SEMANAL - ${new Date().toLocaleDateString('es')}\n\n`;
-  t+=`✅ Completados: ${getDayCompletedCount(dk)}\n⏱️ Minutos: ${getDayTotalMinutes(dk)}\n🔥 Racha: ${state.streak} días\n\nBloques:\n`;
-  blocks.forEach(b=>{const s=getBlockStatus(dk,b.time,b.subject);const icon=s==='completado'?'✅':s==='parcial'?'⚠️':s==='saltado'?'❌':'⬜';t+=`${icon} ${b.time} ${b.subject} (${b.dur}min)\n`});
-  navigator.clipboard.writeText(t).then(()=>alert('✅ Reporte copiado'));
-});
-
-/* ═══════════════════════════════════════
-   ADMIN: DATOS
-   ═══════════════════════════════════════ */
-document.getElementById('btnSyncSheets').addEventListener('click',async()=>{
-  if(!state.config.sheetUrl){alert('Configura la URL de Google Apps Script primero');return}
-  await syncToSheets();
-});
-
-document.getElementById('btnImportSheets').addEventListener('click',()=>{importFromSheets()});
-
-document.getElementById('btnClearDay').addEventListener('click',()=>{
-  if(!confirm('¿Limpiar registros del día actual?'))return;
-  state.logs[getTodayKey()]=[];saveState();addSyncLog('Día limpiado');renderTodayView();
-});
-
-document.getElementById('btnResetWeek').addEventListener('click',()=>{
-  if(!confirm('⚠️ ¿Resetear TODA la semana?'))return;
-  state.logs={};state.streak=0;saveState();addSyncLog('Semana reseteada');renderTodayView();
-});
-
-document.getElementById('btnExportJSON').addEventListener('click',()=>{
-  const json=JSON.stringify({schedule:state.schedule,logs:state.logs,config:state.config,streak:state.streak},null,2);
-  const blob=new Blob([json],{type:'application/json'});const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');a.href=url;a.download='agenda_backup_'+getTodayKey()+'.json';a.click();
-  URL.revokeObjectURL(url);addSyncLog('Backup JSON exportado');
-});
-
-document.getElementById('btnImportJSON').addEventListener('click',()=>{
-  const input=document.createElement('input');input.type='file';input.accept='.json';
-  input.onchange=(e)=>{const file=e.target.files[0];if(!file)return;const r=new FileReader();r.onload=(ev)=>{try{const d=JSON.parse(ev.target.result);state.schedule=d.schedule||state.schedule;state.logs=d.logs||{};state.config={...state.config,...d.config};state.streak=d.streak||0;saveState();addSyncLog('Importado desde JSON');renderTodayView();renderAdminConfig();alert('✅ Importado')}catch(err){alert('Error JSON')}};r.readAsText(file)};
-  input.click();
-});
-
-/* ═══════════════════════════════════════
-   RENDER ADMIN
-   ═══════════════════════════════════════ */
-function renderAdmin(){
-  if(state.adminAuthenticated){document.getElementById('pinScreen').style.display='none';document.getElementById('adminPanel').classList.add('visible')}
-  else{document.getElementById('pinScreen').style.display='flex';document.getElementById('adminPanel').classList.remove('visible')}
-}
-
-/* ═══════════════════════════════════════
-   INIT
-   ═══════════════════════════════════════ */
-function init(){
-  loadState();
-  state.selectedDay=getCurrentDayName();
-
-  // Mostrar setup si no hay URL configurada
-  if(!state.config.sheetUrl){
-    document.getElementById('setupScreen').style.display='flex';
-    document.getElementById('mainNav').style.display='none';
-    document.getElementById('view-today').style.display='none';
-  } else {
-    renderTodayView();
-    updateSyncStatus('green','Listo');
-  }
-
-  setInterval(()=>{if(document.getElementById('view-today').classList.contains('active'))renderTodayView()},60000);
-  if(state.config.notifications&&'Notification'in window)Notification.requestPermission();
-}
-
-// Setup screen handlers
-document.getElementById('setupStart').addEventListener('click',()=>{
-  const url=document.getElementById('setupSheetUrl').value.trim();
-  const name=document.getElementById('setupName').value.trim();
-  if(!url){alert('Pega la URL de tu Apps Script');return}
-  if(!url.includes('script.google.com')){alert('La URL debe ser de script.google.com');return}
-  if(!name){alert('Dinos tu nombre');return}
-  state.config.sheetUrl=url;
-  state.config.name=name;
-  saveState();
-  document.getElementById('setupScreen').style.display='none';
-  document.getElementById('mainNav').style.display='';
-  document.getElementById('view-today').style.display='';
-  renderTodayView();
-  updateSyncStatus('green','Listo');
-});
-
-document.getElementById('setupLogin').addEventListener('click',(e)=>{
-  e.preventDefault();
-  document.getElementById('setupScreen').style.display='none';
-  document.getElementById('mainNav').style.display='';
-  document.getElementById('view-today').style.display='';
-  renderTodayView();
-  updateSyncStatus('green','Listo');
-});
-
-document.getElementById('btnChangeAccount').addEventListener('click',()=>{
-  if(!confirm('¿Cambiar de cuenta? Se mostrará la pantalla de configuración para poner otra URL de Sheets.'))return;
-  state.config.sheetUrl='';
-  saveState();
-  location.reload();
-});
-init();
 </script>
 
 <!--
@@ -1224,9 +190,9 @@ CONFIGURAR GOOGLE SHEETS COMO BASE DE DATOS
 ═══════════════════════════════════════════════════════════════
 
 PASO 1: CREAR SPREADSHEET
-1. Ve a https://sheets.google.com → Nueva hoja de cálculo
-2. Renómbrala: "Agenda de Estudio"
-3. Crea 4 hojas (pestañas) con estos nombres EXACTOS:
+1. Ve a https://sheets.google.com → Nueva hoja de calculo
+2. Renombrala: "Agenda de Estudio"
+3. Crea 4 hojas (pestanas) con estos nombres EXACTOS:
    HORARIO | LOGROS | CONFIGURACION | ESTADISTICAS
 
 PASO 2: PREPARAR LAS HOJAS
@@ -1241,7 +207,7 @@ Hoja "ESTADISTICAS" → Fila 1: fecha | total_bloques | completados | saltados |
 
 PASO 3: CREAR APPS SCRIPT
 1. En el Spreadsheet: Extensiones > Apps Script
-2. Borra todo y pega este código:
+2. Borra todo y pega este codigo:
 
 function doPost(e) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -1249,7 +215,7 @@ function doPost(e) {
   try {
     params = JSON.parse(e.postData.contents);
   } catch(err) {
-    return ContentService.createTextOutput(JSON.stringify({success:false,error:'JSON inválido'}))
+    return ContentService.createTextOutput(JSON.stringify({success:false,error:'JSON invalido'}))
       .setMimeType(ContentService.MimeType.JSON);
   }
   var accion = params.accion;
@@ -1313,7 +279,7 @@ function doPost(e) {
       return ContentService.createTextOutput(JSON.stringify({success:true})).setMimeType(ContentService.MimeType.JSON);
     }
 
-    return ContentService.createTextOutput(JSON.stringify({success:false,error:'Acción no reconocida'})).setMimeType(ContentService.MimeType.JSON);
+    return ContentService.createTextOutput(JSON.stringify({success:false,error:'Accion no reconocida'})).setMimeType(ContentService.MimeType.JSON);
   } catch(err) {
     return ContentService.createTextOutput(JSON.stringify({success:false,error:err.toString()})).setMimeType(ContentService.MimeType.JSON);
   }
@@ -1324,18 +290,18 @@ function doGet(e) {
 }
 
 PASO 4: DESPLEGAR
-1. Clic en "Implementar" > "Nueva implementación"
-2. Tipo: Aplicación web
+1. Clic en "Implementar" > "Nueva implementacion"
+2. Tipo: Aplicacion web
 3. Ejecutar como: "Yo"
-4. Quién tiene acceso: "Cualquier persona" ← IMPORTANTE
+4. Quien tiene acceso: "Cualquier persona" ← IMPORTANTE
 5. Implementar → Copia la URL (termina en /exec)
 
 PASO 5: CONFIGURAR EN LA APP
-1. Abre agenda.html en Chrome/Firefox
+1. Abre index.html en Chrome/Firefox
 2. Ve a ⚙️ Admin (PIN: 1234)
 3. Pega la URL del Web App en "URL del Google Apps Script"
-4. Pega el Spreadsheet ID (está en la URL de Sheets entre /d/ y /edit)
-5. Guarda configuración
+4. Pega el Spreadsheet ID (esta en la URL de Sheets entre /d/ y /edit)
+5. Guarda configuracion
 6. Clic en "Sincronizar todo" para enviar datos iniciales
 
 ¡Listo! Tu base de datos es Google Sheets.
