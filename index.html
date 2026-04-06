@@ -153,15 +153,15 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
 .bc{background:var(--surface);border:1px solid var(--glass-border);border-radius:var(--radius);padding:12px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:var(--transition);position:relative}
 .bc:hover{border-color:var(--accent);transform:translateX(3px)}
 .bc.now{border:2px solid var(--accent);background:rgba(37,99,235,.06)}
-.bc.done{opacity:.65;border-left:3px solid var(--ciencias)}
-.bc.half{opacity:.75;border-left:3px solid var(--gold)}
-.bc.skip{opacity:.4;text-decoration:line-through}
-.bc .bt{font-weight:700;font-size:.9rem;min-width:50px;color:var(--text)}
-.bc .bi2{flex:1}
-.bc .bi2 .bs{font-weight:600;font-size:.95rem}
-.bc .bi2 .bd{font-size:.75rem;color:var(--text3);margin-top:2px}
-.bc .bsi{font-size:1.2rem;min-width:24px;text-align:center}
-.bc .cd{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.bc.done{opacity:.7;border-left:4px solid var(--ciencias)}
+.bc.half{opacity:.8;border-left:4px solid var(--gold)}
+.bc.skip{opacity:.5;text-decoration:line-through}
+.bc .cdot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.bc .time{font-weight:700;font-size:.9rem;min-width:50px;color:var(--text)}
+.bc .info{flex:1}
+.bc .info .subject{font-weight:600;font-size:.95rem}
+.bc .info .duration{font-size:.75rem;color:var(--text3);margin-top:2px}
+.bc .status-icon{font-size:1.2rem;min-width:24px;text-align:center}
 .ba{display:none;gap:6px}
 .bc:hover .ba{display:flex}
 .ba button{background:var(--surface2);border:none;color:var(--text);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:.9rem;transition:var(--transition)}
@@ -565,9 +565,9 @@ function renderToday(){
     const sc=st==='completado'?'done':st==='parcial'?'half':st==='saltado'?'skip':'';
     const si=st==='completado'?'✓':st==='parcial'?'~':st==='saltado'?'✗':'';
     const el=document.createElement('div');el.className='bcard '+sc+(isNow?' now':'');
-    el.innerHTML='<div class="cd" style="background:'+(CC[b.cat]||'#888')+'"></div><div class="bt">'+b.time+'</div><div class="bi2"><div class="bs">'+(isNow?'<span class="badge badge-p" style="margin-right:4px">▶</span>':'')+b.subject+'</div><div class="bd">'+b.dur+' min · <span class="badge '+(CB[b.cat]||'')+'">'+b.cat+'</span></div></div><div class="bsi">'+si+'</div><div class="ba"><button class="bc2" data-tip="Hecho">✓</button><button class="bp" data-tip="Parcial">~</button><button class="bs2" data-tip="Saltado">✗</button></div>';
+    el.innerHTML='<div class="cdot" style="background:'+(CC[b.cat]||'#888')+'"></div><div class="time">'+b.time+'</div><div class="info"><div class="subject">'+(isNow?'<span class="badge badge-p" style="margin-right:4px">▶</span>':'')+b.subject+'<span style="color:#ef4444;margin-left:6px;font-size:.8rem">↓</span></div><div class="duration">'+b.dur+' min · <span class="badge '+(CB[b.cat]||'')+'">'+b.cat+'</span></div></div><div class="status-icon">'+si+'</div><div class="ba"><button class="bc2" data-tip="Hecho">✓</button><button class="bp" data-tip="Parcial">~</button><button class="bs2" data-tip="Saltado">✗</button></div>';
     el.addEventListener('click',e=>{if(!e.target.closest('.ba'))openModal(b,dk,dn)});
-    el.querySelector('.bc2').addEventListener('click',e=>{e.stopPropagation();sStatus(dk,b.time,b.subject,'completado',null);beep();renderToday();const si2=el.querySelector('.bsi');if(si2){si2.classList.add('check-anim');si2.textContent='✓'};if(blocks.every(x=>x.cat==='descanso'||gStatus(dk,x.time,x.subject)==='completado'||gStatus(dk,x.time,x.subject)==='parcial')&&blocks.length>3)confetti()});
+    el.querySelector('.bc2').addEventListener('click',e=>{e.stopPropagation();sStatus(dk,b.time,b.subject,'completado',null);beep();renderToday();const si2=el.querySelector('.status-icon');if(si2){si2.classList.add('check-anim');si2.textContent='✓'};if(blocks.every(x=>x.cat==='descanso'||gStatus(dk,x.time,x.subject)==='completado'||gStatus(dk,x.time,x.subject)==='parcial')&&blocks.length>3)confetti()});
     el.querySelector('.bp').addEventListener('click',e=>{e.stopPropagation();sStatus(dk,b.time,b.subject,'parcial',null);renderToday()});
     el.querySelector('.bs2').addEventListener('click',e=>{e.stopPropagation();sStatus(dk,b.time,b.subject,'saltado',null);renderToday()});
     list.appendChild(el);
