@@ -687,10 +687,10 @@ document.getElementById('expCSV').addEventListener('click',()=>{
 document.getElementById('expPDF').addEventListener('click',()=>{
   const data=getExportData();const days=data?Object.keys(data):DAYS_ES.filter(d=>d!=='domingo');
   const pw=window.open('','_blank');
-  let h='<html><head><title>Agendius - Horario</title><style>body{font-family:Arial,sans-serif;padding:30px;color:#222}h1{color:#7c3aed;border-bottom:3px solid #7c3aed;padding-bottom:10px;font-size:1.4rem}h2{color:#555;font-size:1rem;margin-top:20px;border-bottom:1px solid #ddd;padding-bottom:4px}table{width:100%;border-collapse:collapse;margin:10px 0}th{background:#f0e6ff;color:#555;padding:8px;text-align:left;font-size:.8rem;border:1px solid #e0d0f0}td{padding:6px 8px;border:1px solid #eee;font-size:.8rem}.cat{padding:2px 8px;border-radius:10px;font-size:.7rem;color:#fff}@media print{body{padding:10px}}</style></head><body>';
-  h+='<h1>📚 Agendius - Horario de '+S.name+'</h1><p style="color:#888;font-size:.8rem">'+new Date().toLocaleDateString('es-ES',{weekday:'long',year:'numeric',month:'long',day:'numeric'})+'</p>';
-  days.forEach(day=>{const bl=data?data[day]:S.schedule[day]||[];if(!bl.length)return;h+='<h2>'+day.charAt(0).toUpperCase()+day.slice(1)+'</h2><table><thead><tr><th>Hora</th><th>Materia</th><th>Duracion</th><th>Categoria</th></tr></thead><tbody>';
-  bl.forEach(b=>{const cc=CC[b.cat]||'#888';h+='<tr><td><b>'+b.time+'</b></td><td>'+b.subject+'</td><td>'+b.dur+' min</td><td><span class="cat" style="background:'+cc+'">'+b.cat+'</span></td></tr>'});
+  let h='<html><head><title>Agendius - Horario</title><style>@page{size:landscape;margin:15mm}body{font-family:Arial,sans-serif;padding:20px;color:#222}h1{color:#7c3aed;border-bottom:3px solid #7c3aed;padding-bottom:8px;font-size:1.3rem;margin-bottom:4px}p.sub{color:#888;font-size:.75rem;margin-bottom:16px}.day-table{width:100%;border-collapse:collapse;margin-bottom:16px;page-break-inside:avoid}.day-table th{background:#f0e6ff;color:#555;padding:6px 10px;text-align:left;font-size:.75rem;border:1px solid #e0d0f0}.day-table td{padding:5px 10px;border:1px solid #eee;font-size:.8rem}.day-label{font-size:.9rem;font-weight:700;color:#7c3aed;margin-bottom:4px;margin-top:12px}</style></head><body>';
+  h+='<h1>📚 Agendius - '+S.name+'</h1><p class="sub">'+new Date().toLocaleDateString('es-ES',{weekday:'long',year:'numeric',month:'long',day:'numeric'})+'</p>';
+  days.forEach(day=>{const bl=data?data[day]:S.schedule[day]||[];if(!bl.length)return;h+='<div class="day-label">'+day.charAt(0).toUpperCase()+day.slice(1)+'</div><table class="day-table"><thead><tr><th>Hora</th><th>Materia</th></tr></thead><tbody>';
+  bl.forEach(b=>{h+='<tr><td><b>'+b.time+'</b></td><td>'+b.subject+'</td></tr>'});
   h+='</tbody></table>'});
   h+='</body></html>';pw.document.write(h);pw.document.close();setTimeout(()=>{pw.print()},500);
 });
