@@ -201,6 +201,21 @@ html.dark .sidebar-avatar{background:linear-gradient(135deg,#fff,#999);color:#00
 .pomo-sessions .ps-count{font-size:1.8rem;font-weight:800;color:var(--gold)}
 .pomo-sessions .ps-dots{display:flex;gap:4px;justify-content:center;margin-top:8px}
 .pomo-sessions .ps-dot{width:8px;height:8px;border-radius:50%;background:var(--gold)}
+.pomo-custom{margin-top:12px}
+.pomo-custom-time{display:flex;align-items:center;justify-content:center;gap:6px}
+.pomo-custom-time input{width:48px;background:var(--surface2);border:1px solid var(--surface3);color:var(--text);padding:6px 8px;border-radius:var(--radius);font-family:inherit;font-size:.9rem;text-align:center;outline:none}
+.pomo-custom-time input:focus{border-color:var(--accent)}
+.pomo-custom-time span{color:var(--text3);font-weight:700;font-size:1.1rem}
+.pb-apply{background:var(--accent);color:var(--on-accent);border:none;padding:6px 14px;border-radius:var(--radius);font-family:inherit;font-size:.8rem;font-weight:600;cursor:pointer;transition:var(--transition)}
+.pb-apply:hover{opacity:.85}
+.pomo-sound-btn{margin-top:10px;background:var(--surface2);border:1px solid var(--surface3);color:var(--text2);padding:6px 14px;border-radius:var(--radius);font-family:inherit;font-size:.75rem;cursor:pointer;transition:var(--transition)}
+.pomo-sound-btn:hover{border-color:var(--accent)}
+.pomo-sound-panel{display:none;margin-top:8px;background:var(--surface);border:1px solid var(--surface2);border-radius:var(--radius);overflow:hidden}
+.pomo-sound-panel.vis{display:block}
+.pomo-sound-opt{padding:10px 14px;font-size:.8rem;color:var(--text2);cursor:pointer;transition:var(--transition);border-bottom:1px solid var(--surface2)}
+.pomo-sound-opt:last-child{border-bottom:none}
+.pomo-sound-opt:hover{background:var(--surface2);color:var(--text)}
+.pomo-sound-opt.act{background:var(--accent);color:var(--on-accent)}
 
 .pin-screen{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:50vh;gap:16px}
 .pin-screen.vis{display:flex}
@@ -462,6 +477,22 @@ ti-flat{color:var(--gold)}
         <button data-m="10">Desc 10m</button>
         <button data-m="30">Desc 30m</button>
       </div>
+      <div class="pomo-custom">
+        <div class="pomo-custom-time">
+          <input type="number" id="pomoCustomH" min="0" max="9" placeholder="h" value="0">
+          <span>:</span>
+          <input type="number" id="pomoCustomM" min="0" max="59" placeholder="m" value="0">
+          <button class="pb-apply" id="pomoApply">Aplicar</button>
+        </div>
+      </div>
+      <button class="pomo-sound-btn" id="pomoSoundBtn">🔔 Sonido: Campana</button>
+      <div class="pomo-sound-panel" id="pomoSoundPanel">
+        <div class="pomo-sound-opt" data-s="campana">🔔 Campana</div>
+        <div class="pomo-sound-opt" data-s="alarma">🚨 Alarma</div>
+        <div class="pomo-sound-opt" data-s="beep">📢 Beep</div>
+        <div class="pomo-sound-opt" data-s="doble">🎵 Doble tono</div>
+        <div class="pomo-sound-opt" data-s="vibrar">📳 Vibrar</div>
+      </div>
     </div>
     <div class="pomo-sessions">
       <div class="ps-label">Sesiones hoy</div>
@@ -582,7 +613,34 @@ function totalMin(dk){const logs=gLogs(dk);const dn=curDay();const blocks=S.sche
 function trend(subj){let c=0,p=0;const today=new Date();for(let i=0;i<7;i++){const d=new Date(today);d.setDate(d.getDate()-i);const k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');const dn=DAYS_ES[d.getDay()];const bl=S.schedule[dn]||[];const lg=S.logs[k]||[];const sb=bl.filter(b=>b.subject===subj);p+=sb.length;sb.forEach(s=>{const l=lg.find(x=>x.time===s.time&&x.subject===s.subject);if(l&&(l.status==='completado'||l.status==='parcial'))c++})}return{c,p,pct:p>0?Math.round(c/p*100):0}}
 function subjNotes(subj){const n=[];Object.keys(S.logs).forEach(dk=>{S.logs[dk].forEach(l=>{if(l.subject===subj&&l.note)n.push({date:dk,note:l.note,status:l.status,ts:l.ts||0})})});return n.sort((a,b)=>b.ts-a.ts).slice(0,8)}
 
-function beep(){try{const c=new(window.AudioContext||window.webkitAudioContext)();const o=c.createOscillator();const g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=800;g.gain.value=.1;o.start();o.stop(c.currentTime+.15)}catch(e){}}
+function playSound(type){
+  try{
+    if(type==='vibrar'){if(navigator.vibrate)navigator.vibrate([200,100,200,100,200]);return}
+    const c=new(window.AudioContext||window.webkitAudioContext)();
+    const sounds={
+      campana:()=>{[523,494,440,392].forEach((f,i)=>{const o=c.createOscillator();const g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(.15,c.currentTime+i*.3);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+i*.3+.4);o.start(c.currentTime+i*.3);o.stop(c.currentTime+i*.3+.4)})},
+      alarma:()=>{for(let i=0;i<6;i++){const o=c.createOscillator();const g=c.createGain();o.connect(g);g.connect(c.destination);o.type='square';o.frequency.value=i%2===0?880:660;g.gain.setValueAtTime(.08,c.currentTime+i*.15);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+i*.15+.12);o.start(c.currentTime+i*.15);o.stop(c.currentTime+i*.15+.15)}},
+      beep:()=>{const o=c.createOscillator();const g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sine';o.frequency.value=800;g.gain.setValueAtTime(.15,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.3);o.start();o.stop(c.currentTime+.3)},
+      doble:()=>{[660,880].forEach((f,i)=>{const o=c.createOscillator();const g=c.createGain();o.connect(g);g.connect(c.destination);o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(.12,c.currentTime+i*.25);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+i*.25+.35);o.start(c.currentTime+i*.25);o.stop(c.currentTime+i*.25+.35)})}
+    };
+    (sounds[type]||sounds.campana)();
+  }catch(e){}
+}
+function beep(){playSound(pomoSound)}
+
+let pomoSound=localStorage.getItem('agendius-pomosound')||'campana';
+const soundLabels={campana:'🔔 Campana',alarma:'🚨 Alarma',beep:'📢 Beep',doble:'🎵 Doble tono',vibrar:'📳 Vibrar'};
+function updateSoundBtn(){const b=document.getElementById('pomoSoundBtn');if(b)b.textContent='🔊 '+soundLabels[pomoSound]}
+document.getElementById('pomoSoundBtn').addEventListener('click',()=>{document.getElementById('pomoSoundPanel').classList.toggle('vis')});
+document.querySelectorAll('.pomo-sound-opt').forEach(o=>{
+  o.classList.toggle('act',o.dataset.s===pomoSound);
+  o.addEventListener('click',()=>{
+    pomoSound=o.dataset.s;localStorage.setItem('agendius-pomosound',pomoSound);
+    document.querySelectorAll('.pomo-sound-opt').forEach(x=>x.classList.remove('act'));o.classList.add('act');
+    document.getElementById('pomoSoundPanel').classList.remove('vis');updateSoundBtn();playSound(pomoSound);
+  });
+});
+document.addEventListener('click',e=>{if(!e.target.closest('#pomoSoundBtn')&&!e.target.closest('#pomoSoundPanel'))document.getElementById('pomoSoundPanel').classList.remove('vis')});
 
 function confetti(){let cv=document.querySelector('.confetti-canvas');if(!cv){cv=document.createElement('canvas');cv.className='confetti-canvas';document.body.appendChild(cv)}cv.width=innerWidth;cv.height=innerHeight;const ctx=cv.getContext('2d');const cols=['#7c3aed','#c9a84c','#22c55e','#3b82f6','#f97316','#0ea5e9'];const ps=Array.from({length:60},()=>({x:Math.random()*cv.width,y:-10-Math.random()*80,w:5+Math.random()*7,h:5+Math.random()*7,color:cols[Math.floor(Math.random()*cols.length)],vy:2+Math.random()*3,vx:(Math.random()-.5)*2,rot:Math.random()*360,rv:(Math.random()-.5)*8,r:Math.random()>.5}));let f=0;function a(){if(f>=150){ctx.clearRect(0,0,cv.width,cv.height);return}ctx.clearRect(0,0,cv.width,cv.height);ps.forEach(p=>{p.y+=p.vy;p.x+=p.vx;p.rot+=p.rv;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);ctx.fillStyle=p.color;ctx.globalAlpha=Math.max(0,1-f/150);if(p.r){ctx.beginPath();ctx.arc(0,0,p.w/2,0,Math.PI*2);ctx.fill()}else ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);ctx.restore()});f++;requestAnimationFrame(a)}a()}
 
@@ -674,6 +732,15 @@ function renderPomo(){
 document.getElementById('pomoStart').addEventListener('click',()=>{if(pomo.run){clearInterval(pomo.int);pomo.run=false}else{pomo.int=setInterval(()=>{pomo.left--;if(pomo.left<=0){clearInterval(pomo.int);pomo.run=false;if(pomo.min>=50){pomo.sess++;confetti();beep()}beep()}renderPomo()},1000);pomo.run=true}renderPomo()});
 document.getElementById('pomoReset').addEventListener('click',()=>{if(pomo.int)clearInterval(pomo.int);pomo.run=false;pomo.left=pomo.min*60;renderPomo()});
 document.querySelectorAll('#pomoModes button').forEach(b=>b.addEventListener('click',()=>{if(pomo.int)clearInterval(pomo.int);pomo.run=false;pomo.min=parseInt(b.dataset.m);pomo.left=pomo.min*60;document.querySelectorAll('#pomoModes button').forEach(x=>x.classList.remove('act'));b.classList.add('act');renderPomo()}));
+document.getElementById('pomoApply').addEventListener('click',()=>{
+  const h=parseInt(document.getElementById('pomoCustomH').value)||0;
+  const m=parseInt(document.getElementById('pomoCustomM').value)||0;
+  const total=h*60+m;if(total<1)return;
+  if(pomo.int)clearInterval(pomo.int);pomo.run=false;
+  pomo.min=total;pomo.left=total*60;
+  document.querySelectorAll('#pomoModes button').forEach(x=>x.classList.remove('act'));
+  renderPomo();
+});
 
 /* ═══════════════════════════════════════
    ADMIN
