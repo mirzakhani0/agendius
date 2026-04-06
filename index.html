@@ -127,11 +127,11 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
 .vh .dt .tm{font-size:1.1rem;font-weight:700;color:var(--text);animation:glow 3s infinite}
 
 /* ═══════ STATS ═══════ */
-.sts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
-.st{background:var(--surface);border:1px solid var(--glass-border);border-radius:var(--radius);padding:12px;text-align:center;transition:var(--transition)}
+.sts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.st{background:var(--surface);border:1px solid var(--glass-border);border-radius:var(--radius);padding:14px;text-align:center;transition:var(--transition)}
 .st:hover{border-color:var(--accent)}
-.st .sv{font-size:1.4rem;font-weight:800;color:var(--accent)}
-.st .sl{font-size:.6rem;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-top:1px}
+.st .sv{font-size:1.6rem;font-weight:800;color:var(--accent)}
+.st .sl{font-size:.65rem;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
 
 /* ═══════ CIRCULAR PROGRESS ═══════ */
 .cp-wrap{display:flex;justify-content:center;margin-bottom:16px}
@@ -149,22 +149,22 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
 .ds button.act{background:var(--accent);color:#fff;border-color:var(--accent)}
 
 /* ═══════ BLOCKS ═══════ */
-.bl{display:flex;flex-direction:column;gap:6px}
-.bc{background:var(--surface);border:1px solid var(--glass-border);border-radius:var(--radius);padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:var(--transition);position:relative}
+.bl{display:flex;flex-direction:column;gap:8px}
+.bc{background:var(--surface);border:1px solid var(--glass-border);border-radius:var(--radius);padding:12px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:var(--transition);position:relative}
 .bc:hover{border-color:var(--accent);transform:translateX(3px)}
-.bc.now{border:1.5px solid var(--accent);background:rgba(37,99,235,.06)}
+.bc.now{border:2px solid var(--accent);background:rgba(37,99,235,.06)}
 .bc.done{opacity:.65;border-left:3px solid var(--ciencias)}
 .bc.half{opacity:.75;border-left:3px solid var(--gold)}
 .bc.skip{opacity:.4;text-decoration:line-through}
-.bc .bt{font-weight:700;font-size:.85rem;min-width:46px;color:var(--text)}
+.bc .bt{font-weight:700;font-size:.9rem;min-width:50px;color:var(--text)}
 .bc .bi2{flex:1}
-.bc .bi2 .bs{font-weight:600;font-size:.9rem}
-.bc .bi2 .bd{font-size:.7rem;color:var(--text3);margin-top:2px}
-.bc .bsi{font-size:1.1rem;min-width:22px;text-align:center}
-.bc .cd{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.ba{display:none;gap:5px}
+.bc .bi2 .bs{font-weight:600;font-size:.95rem}
+.bc .bi2 .bd{font-size:.75rem;color:var(--text3);margin-top:2px}
+.bc .bsi{font-size:1.2rem;min-width:24px;text-align:center}
+.bc .cd{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.ba{display:none;gap:6px}
 .bc:hover .ba{display:flex}
-.ba button{background:var(--surface2);border:none;color:var(--text);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.8rem;transition:var(--transition)}
+.ba button{background:var(--surface2);border:none;color:var(--text);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:.9rem;transition:var(--transition)}
 .ba .bc2:hover{background:var(--ciencias)}
 .ba .bp:hover{background:var(--gold)}
 .ba .bs2:hover{background:#ef4444}
@@ -564,9 +564,8 @@ function renderToday(){
     const isNow=nm>=bm&&nm<em;
     const sc=st==='completado'?'done':st==='parcial'?'half':st==='saltado'?'skip':'';
     const si=st==='completado'?'✓':st==='parcial'?'~':st==='saltado'?'✗':'';
-    const tr=trend(b.subject);const ti=tr.pct>=80?'↑':tr.pct>=50?'→':'↓';const tc=tr.pct>=80?'ti-up':tr.pct>=50?'ti-flat':'ti-down';
     const el=document.createElement('div');el.className='bcard '+sc+(isNow?' now':'');
-    el.innerHTML='<div class="cd" style="background:'+(CC[b.cat]||'#888')+'"></div><div class="bt">'+b.time+'</div><div class="bi2"><div class="bs">'+(isNow?'<span class="badge badge-p" style="margin-right:3px">▶</span>':'')+b.subject+'<span class="ti '+tc+'" data-tip="'+tr.pct+'% en 7d">'+ti+'</span></div><div class="bd">'+b.dur+' min · <span class="badge '+(CB[b.cat]||'')+'">'+b.cat+'</span></div></div><div class="bsi">'+si+'</div><div class="ba"><button class="bc2" data-tip="Hecho">✓</button><button class="bp" data-tip="Parcial">~</button><button class="bs2" data-tip="Saltado">✗</button></div>';
+    el.innerHTML='<div class="cd" style="background:'+(CC[b.cat]||'#888')+'"></div><div class="bt">'+b.time+'</div><div class="bi2"><div class="bs">'+(isNow?'<span class="badge badge-p" style="margin-right:4px">▶</span>':'')+b.subject+'</div><div class="bd">'+b.dur+' min · <span class="badge '+(CB[b.cat]||'')+'">'+b.cat+'</span></div></div><div class="bsi">'+si+'</div><div class="ba"><button class="bc2" data-tip="Hecho">✓</button><button class="bp" data-tip="Parcial">~</button><button class="bs2" data-tip="Saltado">✗</button></div>';
     el.addEventListener('click',e=>{if(!e.target.closest('.ba'))openModal(b,dk,dn)});
     el.querySelector('.bc2').addEventListener('click',e=>{e.stopPropagation();sStatus(dk,b.time,b.subject,'completado',null);beep();renderToday();const si2=el.querySelector('.bsi');if(si2){si2.classList.add('check-anim');si2.textContent='✓'};if(blocks.every(x=>x.cat==='descanso'||gStatus(dk,x.time,x.subject)==='completado'||gStatus(dk,x.time,x.subject)==='parcial')&&blocks.length>3)confetti()});
     el.querySelector('.bp').addEventListener('click',e=>{e.stopPropagation();sStatus(dk,b.time,b.subject,'parcial',null);renderToday()});
