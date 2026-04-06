@@ -92,12 +92,12 @@ nav button.active{background:var(--surface2)}
 /* ═══════════════════════════════════════
    VISTA SEMANAL
    ═══════════════════════════════════════ */
-.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;overflow-x:auto}
-.week-day{background:var(--surface);border:1px solid var(--surface2);border-radius:var(--radius);padding:12px;min-width:160px}
-.week-day h3{font-size:.85rem;font-weight:700;margin-bottom:8px;color:var(--accent);text-align:center}
-.week-day .week-block{background:var(--surface2);border-radius:6px;padding:6px 8px;margin-bottom:4px;font-size:.7rem;display:flex;justify-content:space-between;align-items:center}
-.week-day .week-block .wb-time{color:var(--text3);font-weight:600}
-.week-day .week-block .wb-subject{color:var(--text);font-weight:500}
+.week-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;overflow-x:auto;padding-bottom:12px}
+.week-day{background:var(--surface);border:1px solid var(--surface2);border-radius:var(--radius);padding:12px;min-width:0}
+.week-day h3{font-size:.85rem;font-weight:700;margin-bottom:8px;color:var(--accent);text-align:center;padding-bottom:6px;border-bottom:1px solid var(--surface2)}
+.week-day .week-block{background:var(--surface2);border-radius:6px;padding:6px 8px;margin-bottom:4px;font-size:.7rem;display:flex;justify-content:space-between;align-items:center;border-left:3px solid transparent}
+.week-day .week-block .wb-time{color:var(--text3);font-weight:600;min-width:40px}
+.week-day .week-block .wb-subject{color:var(--text);font-weight:500;text-align:right;flex:1}
 
 /* ═══════════════════════════════════════
    PANEL ADMIN
@@ -863,7 +863,7 @@ function renderWeekView(){
     col.innerHTML=`<h3>${DAYS_LABEL[i]||day}</h3>`;
     blocks.forEach(b=>{
       const color=state.config.colors[b.cat]||CAT_COLORS[b.cat]||'#888';
-      col.innerHTML+=`<div class="week-block"><span class="wb-time">${b.time}</span><span class="wb-subject" style="color:${color}">${b.subject}</span></div>`;
+      col.innerHTML+=`<div class="week-block" style="border-left-color:${color}"><span class="wb-time">${b.time}</span><span class="wb-subject">${b.subject}</span></div>`;
     });
     grid.appendChild(col);
   });
