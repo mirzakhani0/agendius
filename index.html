@@ -537,7 +537,7 @@ function renderToday(){
   const dn=S.selDay||curDay();const dk=todayKey();const blocks=S.schedule[dn]||[];
   const now=curTime();const nm=t2m(now);
   const sel=document.getElementById('daySel');sel.innerHTML='';
-  DAYS_ES.forEach((d,i)=>{if(d==='domingo')return;const b=document.createElement('button');b.textContent=DAYS_L[i];b.className=d===dn?'active':'';b.addEventListener('click',()=>{S.selDay=d;renderToday()});sel.appendChild(b)});
+  DAYS_ES.forEach((d,i)=>{const b=document.createElement('button');b.textContent=DAYS_L[i];b.className=d===dn?'active':'';b.addEventListener('click',()=>{S.selDay=d;renderToday()});sel.appendChild(b)});
   const dc=doneCount(dk);const tot=blocks.length;const pct=tot?Math.round(dc/tot*100):0;
   document.getElementById('stDone').textContent=dc;
   document.getElementById('stStreak').textContent=S.pomoSessions;
@@ -578,7 +578,7 @@ document.getElementById('mSkip').addEventListener('click',()=>{if(!S.selBlock)re
 function renderWeek(){
   const st=(document.getElementById('wSearch').value||'').toLowerCase().trim();
   const g=document.getElementById('wGrid');g.innerHTML='';
-  DAYS_ES.forEach((day,i)=>{if(day==='domingo')return;const bl=S.schedule[day]||[];const c=document.createElement('div');c.className='wday';c.innerHTML='<h3>'+DAYS_L[i]+'</h3>';bl.forEach(b=>{const m=!st||b.subject.toLowerCase().includes(st)||b.cat.includes(st);c.innerHTML+='<div class="wb '+(m?'':'hid')+'" style="border-left-color:'+(CC[b.cat]||'#888')+'"><span class="wt">'+b.time+'</span><span class="ws">'+b.subject+'</span></div>'});g.appendChild(c)});
+  DAYS_ES.forEach((day,i)=>{const bl=S.schedule[day]||[];const c=document.createElement('div');c.className='wday';c.innerHTML='<h3>'+DAYS_L[i]+'</h3>';bl.forEach(b=>{const m=!st||b.subject.toLowerCase().includes(st)||b.cat.includes(st);c.innerHTML+='<div class="wb '+(m?'':'hid')+'" style="border-left-color:'+(CC[b.cat]||'#888')+'"><span class="wt">'+b.time+'</span><span class="ws">'+b.subject+'</span></div>'});g.appendChild(c)});
 }
 document.getElementById('wSearch').addEventListener('input',renderWeek);
 
@@ -612,8 +612,8 @@ let hasChanges=false;
 function renderAdmin(){document.getElementById('adminPanel').classList.add('vis');populateEditDaySel();renderEditor()}
 function populateEditDaySel(){
   const sel=document.getElementById('editDaySel');if(!sel)return;sel.innerHTML='';
-  DAYS_ES.forEach(d=>{if(d==='domingo')return;const o=document.createElement('option');o.value=d;o.textContent=d.charAt(0).toUpperCase()+d.slice(1);o.selected=d===editDay;sel.appendChild(o)});
-  const exp=document.getElementById('expDaySel');if(exp){exp.innerHTML='<option value="all">Todo el horario</option>';DAYS_ES.forEach(d=>{if(d==='domingo')return;const o=document.createElement('option');o.value=d;o.textContent=d.charAt(0).toUpperCase()+d.slice(1);exp.appendChild(o)})}
+  DAYS_ES.forEach(d=>{const o=document.createElement('option');o.value=d;o.textContent=d.charAt(0).toUpperCase()+d.slice(1);o.selected=d===editDay;sel.appendChild(o)});
+  const exp=document.getElementById('expDaySel');if(exp){exp.innerHTML='<option value="all">Todo el horario</option>';DAYS_ES.forEach(d=>{const o=document.createElement('option');o.value=d;o.textContent=d.charAt(0).toUpperCase()+d.slice(1);exp.appendChild(o)})}
 }
 document.querySelectorAll('.admin-tabs button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.admin-tabs button').forEach(x=>x.classList.remove('act'));b.classList.add('act');document.querySelectorAll('.admin-sec').forEach(x=>x.classList.remove('act'));document.getElementById('a-'+b.dataset.a).classList.add('act');if(b.dataset.a==='stats')renderStats();if(b.dataset.a==='edit'){populateEditDaySel();renderEditor()}}));
 
@@ -649,9 +649,9 @@ document.getElementById('saveSched').addEventListener('click',()=>{
 
 document.getElementById('copyDayBtn').addEventListener('click',()=>{
   const blocks=S.schedule[editDay]||[];if(!blocks.length){alert('El dia '+editDay+' no tiene bloques');return}
-  let msg='Copiar '+editDay+' a:\n';DAYS_ES.forEach((d,i)=>{if(d!=='domingo'&&d!==editDay)msg+=(i+1)+'. '+d+'\n'});
+  let msg='Copiar '+editDay+' a:\n';DAYS_ES.forEach((d,i)=>{if(d!==editDay)msg+=(i+1)+'. '+d+'\n'});
   const choice=prompt(msg+'\nIngresa el numero del dia destino:');
-  if(!choice)return;const idx=parseInt(choice)-1;const validDays=DAYS_ES.filter(d=>d!=='domingo'&&d!==editDay);
+  if(!choice)return;const idx=parseInt(choice)-1;const validDays=DAYS_ES.filter(d=>d!==editDay);
   if(idx<0||idx>=validDays.length){alert('Numero invalido');return}
   const target=validDays[idx];S.schedule[target]=JSON.parse(JSON.stringify(blocks));save();markChanged();alert('Horario de '+editDay+' copiado a '+target);
 });
