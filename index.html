@@ -686,13 +686,28 @@ document.getElementById('expCSV').addEventListener('click',()=>{
 
 document.getElementById('expPDF').addEventListener('click',()=>{
   const data=getExportData();const days=data?Object.keys(data):DAYS_ES.filter(d=>d!=='domingo');
+  const allBlocks={};days.forEach(d=>{allBlocks[d]=data?data[d]||[]:S.schedule[d]||[]});
   const pw=window.open('','_blank');
-  let h='<html><head><title>Agendius - Horario</title><style>@page{size:landscape;margin:15mm}body{font-family:Arial,sans-serif;padding:20px;color:#222}h1{color:#7c3aed;border-bottom:3px solid #7c3aed;padding-bottom:8px;font-size:1.3rem;margin-bottom:4px}p.sub{color:#888;font-size:.75rem;margin-bottom:16px}.day-table{width:100%;border-collapse:collapse;margin-bottom:16px;page-break-inside:avoid}.day-table th{background:#f0e6ff;color:#555;padding:6px 10px;text-align:left;font-size:.75rem;border:1px solid #e0d0f0}.day-table td{padding:5px 10px;border:1px solid #eee;font-size:.8rem}.day-label{font-size:.9rem;font-weight:700;color:#7c3aed;margin-bottom:4px;margin-top:12px}</style></head><body>';
+  let h='<html><head><title>Agendius - Horario Semanal</title><style>';
+  h+='@page{size:landscape;margin:12mm}';
+  h+='body{font-family:Arial,sans-serif;padding:16px;color:#222}';
+  h+='h1{color:#7c3aed;font-size:1.2rem;margin-bottom:2px}';
+  h+='p.sub{color:#888;font-size:.7rem;margin-bottom:12px}';
+  h+='.grid{display:flex;gap:6px}';
+  h+='.col{flex:1;background:#f8f8fc;border:1px solid #e0e0e8;border-radius:6px;overflow:hidden}';
+  h+='.col-head{background:#7c3aed;color:#fff;text-align:center;padding:6px;font-size:.75rem;font-weight:700}';
+  h+='.blk{padding:4px 8px;margin:3px 4px;border-radius:4px;font-size:.65rem;border-left:3px solid #7c3aed;background:#fff}';
+  h+='.blk .bt{font-weight:700;color:#555;font-size:.6rem}';
+  h+='.blk .bs{color:#222;font-weight:600}';
+  h+='</style></head><body>';
   h+='<h1>📚 Agendius - '+S.name+'</h1><p class="sub">'+new Date().toLocaleDateString('es-ES',{weekday:'long',year:'numeric',month:'long',day:'numeric'})+'</p>';
-  days.forEach(day=>{const bl=data?data[day]:S.schedule[day]||[];if(!bl.length)return;h+='<div class="day-label">'+day.charAt(0).toUpperCase()+day.slice(1)+'</div><table class="day-table"><thead><tr><th>Hora</th><th>Materia</th></tr></thead><tbody>';
-  bl.forEach(b=>{h+='<tr><td><b>'+b.time+'</b></td><td>'+b.subject+'</td></tr>'});
-  h+='</tbody></table>'});
-  h+='</body></html>';pw.document.write(h);pw.document.close();setTimeout(()=>{pw.print()},500);
+  h+='<div class="grid">';
+  days.forEach(day=>{const bl=allBlocks[day]||[];const dl={lunes:'Lun',martes:'Mar',miercoles:'Mie',jueves:'Jue',viernes:'Vie',sabado:'Sab'};
+  h+='<div class="col"><div class="col-head">'+(dl[day]||day)+'</div>';
+  bl.forEach(b=>{const cc=CC[b.cat]||'#888';h+='<div class="blk" style="border-left-color:'+cc+'"><div class="bt">'+b.time+'</div><div class="bs">'+b.subject+'</div></div>'});
+  h+='</div>'});
+  h+='</div></body></html>';
+  pw.document.write(h);pw.document.close();setTimeout(()=>{pw.print()},500);
 });
 
 /* ═══════════════════════════════════════
