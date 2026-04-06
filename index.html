@@ -20,6 +20,11 @@
   --transition:all .3s cubic-bezier(.4,0,.2,1);
   --sidebar-w:270px;
 }
+html.dark{
+  --bg:#0a0a14;--surface:#12121f;--surface2:#1a1a2e;--surface3:#24243a;
+  --text:#e8e8f0;--text2:#a0a0b8;--text3:#6a6a82;
+  --accent:#7c3aed;--accent2:#9333ea;--gold:#c9a84c;
+}
 html{font-size:16px;scroll-behavior:smooth}
 body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 
@@ -342,6 +347,7 @@ ti-flat{color:var(--gold)}
     <button class="snav-btn" data-v="admin"><div class="snav-icon">⚙️</div><div class="snav-text">Admin</div></button>
   </nav>
   <div class="sidebar-footer">
+    <button id="btnTheme">🌙 Modo oscuro</button>
     <button id="btnResetAll">🔄 Reiniciar todo</button>
   </div>
 </aside>
@@ -354,6 +360,7 @@ ti-flat{color:var(--gold)}
   <button data-v="week"><div class="bnav-i">📅</div>Semana</button>
   <button data-v="pomo"><div class="bnav-i">⏱️</div>Pomodoro</button>
   <button data-v="admin"><div class="bnav-i">⚙️</div>Admin</button>
+  <button id="btnThemeMobile">🌙</button>
 </nav>
 
 <!-- ═══════════════════════════════════════
@@ -807,6 +814,23 @@ document.getElementById('dlTemplate').addEventListener('click',()=>{
 });
 
 document.getElementById('btnResetAll').addEventListener('click',()=>{if(confirm('Reiniciar todo? Se borraran tus datos.')){localStorage.removeItem('agendius');location.reload()}});
+
+/* ═══════════════════════════════════════
+   THEME TOGGLE
+   ═══════════════════════════════════════ */
+function setTheme(dark){
+  document.documentElement.classList.toggle('dark',dark);
+  localStorage.setItem('agendius-theme',dark?'dark':'light');
+  const label=dark?'☀️ Modo claro':'🌙 Modo oscuro';
+  const tb=document.getElementById('btnTheme');if(tb)tb.textContent=label;
+  const tm=document.getElementById('btnThemeMobile');if(tm)tm.textContent=dark?'☀️':'🌙';
+}
+document.getElementById('btnTheme').addEventListener('click',()=>setTheme(!document.documentElement.classList.contains('dark')));
+document.getElementById('btnThemeMobile').addEventListener('click',()=>setTheme(!document.documentElement.classList.contains('dark')));
+const savedTheme=localStorage.getItem('agendius-theme');
+if(savedTheme==='dark')setTheme(true);
+else if(savedTheme==='light')setTheme(false);
+else if(window.matchMedia('(prefers-color-scheme:dark)').matches)setTheme(true);
 
 /* ═══════════════════════════════════════
    INIT
