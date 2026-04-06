@@ -138,7 +138,7 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
 .blist{display:flex;flex-direction:column;gap:6px}
 .bcard{background:var(--surface);border:1px solid var(--surface2);border-radius:var(--radius);padding:10px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:var(--transition);position:relative}
 .bcard:hover{border-color:var(--accent);transform:translateX(3px)}
-.bcard.now{animation:pulse 2s infinite;border-color:var(--accent)}
+.bcard.now{border:2px solid var(--accent);background:rgba(124,58,237,.08)}
 .bcard.done{opacity:.65;border-left:3px solid var(--ciencias)}
 .bcard.half{opacity:.75;border-left:3px solid var(--gold)}
 .bcard.skip{opacity:.4;text-decoration:line-through}
@@ -422,17 +422,29 @@ ti-flat{color:var(--gold)}
     </div>
     <div class="admin-sec act" id="a-edit">
       <h3>Editar Horario</h3>
-      <div class="bg mb8"><button class="btn" id="addBlock">+ Bloque</button></div>
+      <div class="bg mb8">
+        <select id="editDaySel" style="background:var(--surface2);border:1px solid var(--surface3);color:var(--text);padding:6px 12px;border-radius:var(--radius);font-family:inherit;font-size:.8rem;outline:none"></select>
+        <button class="btn" id="addBlock">+ Bloque</button>
+        <button class="btn btn-s" id="copyDayBtn">📋 Copiar dia a...</button>
+        <button class="btn btn-s" id="restoreBtn">↺ Restaurar original</button>
+      </div>
+      <div id="unsavedInd" style="display:none;font-size:.75rem;color:var(--gold);margin-bottom:8px">⚠ Cambios sin guardar</div>
       <div class="etbl" id="editTbl"></div>
-      <div class="bg"><button class="btn btn-g" id="saveSched">💾 Guardar</button></div>
+      <div class="bg"><button class="btn btn-g" id="saveSched">💾 Guardar cambios</button></div>
     </div>
     <div class="admin-sec" id="a-exp">
-      <h3>Exportar / Importar</h3>
-      <div class="bg">
-        <button class="btn btn-g" id="expExcel">📤 Exportar Excel</button>
-        <button class="btn btn-s" id="impExcel">📥 Importar Excel</button>
+      <h3>Exportar</h3>
+      <div class="bg mb8">
+        <select id="expDaySel" style="background:var(--surface2);border:1px solid var(--surface3);color:var(--text);padding:6px 12px;border-radius:var(--radius);font-family:inherit;font-size:.8rem;outline:none"><option value="all">Todo el horario</option></select>
       </div>
+      <div class="bg mb8">
+        <button class="btn btn-g" id="expExcel">📤 Excel</button>
+        <button class="btn btn-s" id="expPDF">📄 PDF</button>
+        <button class="btn btn-s" id="expCSV">📊 CSV</button>
+      </div>
+      <h3 class="mt12">Importar</h3>
       <div class="bg">
+        <button class="btn btn-s" id="impExcel">📥 Importar Excel</button>
         <button class="btn btn-s" id="expJSON">💾 Backup JSON</button>
         <button class="btn btn-s" id="impJSON">📂 Restaurar JSON</button>
       </div>
@@ -479,7 +491,7 @@ let S={schedule:{},logs:{},name:'',pomoSessions:0,selDay:''};
    PERSISTENCIA
    ═══════════════════════════════════════ */
 function save(){localStorage.setItem('agendius',JSON.stringify({schedule:S.schedule,logs:S.logs,name:S.name,pomoSessions:S.pomoSessions}))}
-function load(){const d=localStorage.getItem('agendius');if(d){const o=JSON.parse(d);S.schedule=o.schedule||{};S.logs=o.logs||{};S.name=o.name||'';S.pomoSessions=o.pomoSessions||0}return!!S.name&&Object.keys(S.schedule).length>0}
+function load(){const d=localStorage.getItem('agendius');if(d){const o=JSON.parse(d);S.schedule=o.schedule||{};S.logs=o.logs||{};S.name=o.name||'';S.pomoSessions=o.pomoSessions||0;origSchedule=JSON.parse(JSON.stringify(S.schedule))}return!!S.name&&Object.keys(S.schedule).length>0}
 
 /* ═══════════════════════════════════════
    UTILIDADES
@@ -593,25 +605,102 @@ document.querySelectorAll('#pomoModes button').forEach(b=>b.addEventListener('cl
 /* ═══════════════════════════════════════
    ADMIN
    ═══════════════════════════════════════ */
-function renderAdmin(){renderEditor()}
-document.querySelectorAll('.admin-tabs button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.admin-tabs button').forEach(x=>x.classList.remove('act'));b.classList.add('act');document.querySelectorAll('.admin-sec').forEach(x=>x.classList.remove('act'));document.getElementById('a-'+b.dataset.a).classList.add('act');if(b.dataset.a==='stats')renderStats()}));
+let editDay=curDay();
+let origSchedule=null;
+let hasChanges=false;
+
+function renderAdmin(){populateEditDaySel();renderEditor()}
+function populateEditDaySel(){
+  const sel=document.getElementById('editDaySel');if(!sel)return;sel.innerHTML='';
+  DAYS_ES.forEach(d=>{if(d==='domingo')return;const o=document.createElement('option');o.value=d;o.textContent=d.charAt(0).toUpperCase()+d.slice(1);o.selected=d===editDay;sel.appendChild(o)});
+  const exp=document.getElementById('expDaySel');if(exp){exp.innerHTML='<option value="all">Todo el horario</option>';DAYS_ES.forEach(d=>{if(d==='domingo')return;const o=document.createElement('option');o.value=d;o.textContent=d.charAt(0).toUpperCase()+d.slice(1);exp.appendChild(o)})}
+}
+document.querySelectorAll('.admin-tabs button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.admin-tabs button').forEach(x=>x.classList.remove('act'));b.classList.add('act');document.querySelectorAll('.admin-sec').forEach(x=>x.classList.remove('act'));document.getElementById('a-'+b.dataset.a).classList.add('act');if(b.dataset.a==='stats')renderStats();if(b.dataset.a==='edit'){populateEditDaySel();renderEditor()}}));
+
+document.getElementById('editDaySel').addEventListener('change',e=>{editDay=e.target.value;renderEditor()});
+
+function markChanged(){hasChanges=true;document.getElementById('unsavedInd').style.display=''}
+function clearChanged(){hasChanges=false;document.getElementById('unsavedInd').style.display='none'}
 
 function renderEditor(){
-  const c=document.getElementById('editTbl');let h='<table><thead><tr><th>Dia</th><th>Hora</th><th>Materia</th><th>Dur</th><th>Cat</th><th></th></tr></thead><tbody>';
-  DAYS_ES.forEach(day=>{if(day==='domingo')return;(S.schedule[day]||[]).forEach((b,i)=>{h+='<tr><td><input value="'+day+'" readonly style="opacity:.5"></td><td><input type="time" value="'+b.time+'" class="et"></td><td><input value="'+b.subject+'" class="es"></td><td><input type="number" value="'+b.dur+'" class="ed" min="5" step="5"></td><td><select class="ec">'+Object.keys(CC).map(c=>'<option value="'+c+'"'+(c===b.cat?' selected':'')+'>'+c+'</option>').join('')+'</select></td><td><button class="btn btn-d" style="padding:2px 6px;font-size:.65rem" data-del="'+day+','+i+'">✗</button></td></tr>'})});
+  const c=document.getElementById('editTbl');const blocks=S.schedule[editDay]||[];
+  if(!blocks.length){c.innerHTML='<p style="color:var(--text3);font-size:.85rem;text-align:center;padding:20px">No hay bloques para '+editDay+'. Agrega uno con el boton + Bloque.</p>';return}
+  let h='<table><thead><tr><th>#</th><th>Hora</th><th>Materia</th><th>Dur</th><th>Cat</th><th></th></tr></thead><tbody>';
+  blocks.forEach((b,i)=>{
+    h+='<tr data-idx="'+i+'"><td style="color:var(--text3);font-size:.7rem">'+(i+1)+'</td><td><input type="time" value="'+b.time+'" class="et" onchange="markChanged()"></td><td><input value="'+b.subject+'" class="es" oninput="markChanged()"></td><td><input type="number" value="'+b.dur+'" class="ed" min="5" step="5" onchange="markChanged()"></td><td><select class="ec" onchange="markChanged()">'+Object.keys(CC).map(ct=>'<option value="'+ct+'"'+(ct===b.cat?' selected':'')+'>'+ct+'</option>').join('')+'</select></td><td style="display:flex;gap:3px;flex-direction:column"><button class="btn btn-s" style="padding:1px 5px;font-size:.6rem" data-up="'+i+'" title="Subir">▲</button><button class="btn btn-s" style="padding:1px 5px;font-size:.6rem" data-down="'+i+'" title="Bajar">▼</button><button class="btn btn-s" style="padding:1px 5px;font-size:.6rem" data-dup="'+i+'" title="Duplicar">⧉</button><button class="btn btn-d" style="padding:1px 5px;font-size:.6rem" data-del="'+i+'" title="Eliminar">✗</button></td></tr>';
+  });
   h+='</tbody></table>';c.innerHTML=h;
-  c.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>{const[d,i]=b.dataset.del.split(',');S.schedule[d].splice(parseInt(i),1);save();renderEditor()}));
+  c.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>{S.schedule[editDay].splice(parseInt(b.dataset.del),1);save();markChanged();renderEditor()}));
+  c.querySelectorAll('[data-up]').forEach(b=>b.addEventListener('click',()=>{const i=parseInt(b.dataset.up);if(i>0){const arr=S.schedule[editDay];[arr[i-1],arr[i]]=[arr[i],arr[i-1]];save();markChanged();renderEditor()}}));
+  c.querySelectorAll('[data-down]').forEach(b=>b.addEventListener('click',()=>{const i=parseInt(b.dataset.down);const arr=S.schedule[editDay];if(i<arr.length-1){[arr[i],arr[i+1]]=[arr[i+1],arr[i]];save();markChanged();renderEditor()}}));
+  c.querySelectorAll('[data-dup]').forEach(b=>b.addEventListener('click',()=>{const i=parseInt(b.dataset.dup);const arr=S.schedule[editDay];arr.splice(i+1,0,{...arr[i]});save();markChanged();renderEditor()}));
 }
 
-document.getElementById('addBlock').addEventListener('click',()=>{const d=curDay();if(!S.schedule[d])S.schedule[d]=[];S.schedule[d].push({time:'12:00',subject:'NUEVO',dur:50,cat:'ciencias'});save();renderEditor()});
-document.getElementById('saveSched').addEventListener('click',()=>{document.querySelectorAll('#editTbl tbody tr').forEach(tr=>{const d=tr.querySelector('input').value;const t=tr.querySelector('.et').value;const s=tr.querySelector('.es').value;const dur=parseInt(tr.querySelector('.ed').value);const c=tr.querySelector('.ec').value;const i=parseInt(tr.dataset.idx);if(S.schedule[d]&&S.schedule[d][i])S.schedule[d][i]={time:t,subject:s,dur,cat:c}});save();renderToday();alert('Guardado')});
+document.getElementById('addBlock').addEventListener('click',()=>{if(!S.schedule[editDay])S.schedule[editDay]=[];S.schedule[editDay].push({time:'12:00',subject:'NUEVO',dur:50,cat:'ciencias'});save();markChanged();renderEditor()});
+
+document.getElementById('saveSched').addEventListener('click',()=>{
+  document.querySelectorAll('#editTbl tbody tr').forEach(tr=>{
+    const i=parseInt(tr.dataset.idx);const t=tr.querySelector('.et').value;const s=tr.querySelector('.es').value;const dur=parseInt(tr.querySelector('.ed').value);const c=tr.querySelector('.ec').value;
+    if(S.schedule[editDay]&&S.schedule[editDay][i])S.schedule[editDay][i]={time:t,subject:s,dur,cat:c};
+  });
+  S.schedule[editDay].sort((a,b)=>t2m(a.time)-t2m(b.time));
+  save();clearChanged();renderToday();alert('Guardado');
+});
+
+document.getElementById('copyDayBtn').addEventListener('click',()=>{
+  const blocks=S.schedule[editDay]||[];if(!blocks.length){alert('El dia '+editDay+' no tiene bloques');return}
+  let msg='Copiar '+editDay+' a:\n';DAYS_ES.forEach((d,i)=>{if(d!=='domingo'&&d!==editDay)msg+=(i+1)+'. '+d+'\n'});
+  const choice=prompt(msg+'\nIngresa el numero del dia destino:');
+  if(!choice)return;const idx=parseInt(choice)-1;const validDays=DAYS_ES.filter(d=>d!=='domingo'&&d!==editDay);
+  if(idx<0||idx>=validDays.length){alert('Numero invalido');return}
+  const target=validDays[idx];S.schedule[target]=JSON.parse(JSON.stringify(blocks));save();markChanged();alert('Horario de '+editDay+' copiado a '+target);
+});
+
+document.getElementById('restoreBtn').addEventListener('click',()=>{
+  if(!origSchedule){alert('No hay horario original guardado');return}
+  if(!confirm('Restaurar el horario original? Se perderan los cambios.'))return;
+  S.schedule=JSON.parse(JSON.stringify(origSchedule));save();clearChanged();renderEditor();renderToday();alert('Restaurado');
+});
+
+/* ═══════════════════════════════════════
+   EXPORTAR
+   ═══════════════════════════════════════ */
+function getExportData(){const v=document.getElementById('expDaySel').value;if(v==='all')return null;return{[v]:S.schedule[v]||[]}}
+
+document.getElementById('expExcel').addEventListener('click',()=>{
+  const data=getExportData();const days=data?Object.keys(data):DAYS_ES.filter(d=>d!=='domingo');
+  const rows=[];days.forEach(day=>{(data?data[day]:S.schedule[day]||[]).forEach(b=>{rows.push({Dia:day,Hora:b.time,Materia:b.subject,Duracion:b.dur,Categoria:b.cat})})});
+  const logs=[];Object.keys(S.logs).forEach(dk=>{S.logs[dk].forEach(l=>{logs.push({Fecha:dk,Hora:l.time,Materia:l.subject,Estado:l.status,Nota:l.note||''})})});
+  const wb=XLSX.utils.book_new();
+  if(rows.length)XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(rows),'Horario');
+  if(logs.length)XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(logs),'Logros');
+  XLSX.writeFile(wb,'Agendius_'+todayKey()+'.xlsx');
+});
+
+document.getElementById('expCSV').addEventListener('click',()=>{
+  const data=getExportData();const days=data?Object.keys(data):DAYS_ES.filter(d=>d!=='domingo');
+  let csv='Dia,Hora,Materia,Duracion,Categoria\n';
+  days.forEach(day=>{(data?data[day]:S.schedule[day]||[]).forEach(b=>{csv+=day+','+b.time+','+b.subject+','+b.dur+','+b.cat+'\n'})});
+  const blob=new Blob([csv],{type:'text/csv'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='Agendius_'+todayKey()+'.csv';a.click();URL.revokeObjectURL(url);
+});
+
+document.getElementById('expPDF').addEventListener('click',()=>{
+  const data=getExportData();const days=data?Object.keys(data):DAYS_ES.filter(d=>d!=='domingo');
+  const pw=window.open('','_blank');
+  let h='<html><head><title>Agendius - Horario</title><style>body{font-family:Arial,sans-serif;padding:30px;color:#222}h1{color:#7c3aed;border-bottom:3px solid #7c3aed;padding-bottom:10px;font-size:1.4rem}h2{color:#555;font-size:1rem;margin-top:20px;border-bottom:1px solid #ddd;padding-bottom:4px}table{width:100%;border-collapse:collapse;margin:10px 0}th{background:#f0e6ff;color:#555;padding:8px;text-align:left;font-size:.8rem;border:1px solid #e0d0f0}td{padding:6px 8px;border:1px solid #eee;font-size:.8rem}.cat{padding:2px 8px;border-radius:10px;font-size:.7rem;color:#fff}@media print{body{padding:10px}}</style></head><body>';
+  h+='<h1>📚 Agendius - Horario de '+S.name+'</h1><p style="color:#888;font-size:.8rem">'+new Date().toLocaleDateString('es-ES',{weekday:'long',year:'numeric',month:'long',day:'numeric'})+'</p>';
+  days.forEach(day=>{const bl=data?data[day]:S.schedule[day]||[];if(!bl.length)return;h+='<h2>'+day.charAt(0).toUpperCase()+day.slice(1)+'</h2><table><thead><tr><th>Hora</th><th>Materia</th><th>Duracion</th><th>Categoria</th></tr></thead><tbody>';
+  bl.forEach(b=>{const cc=CC[b.cat]||'#888';h+='<tr><td><b>'+b.time+'</b></td><td>'+b.subject+'</td><td>'+b.dur+' min</td><td><span class="cat" style="background:'+cc+'">'+b.cat+'</span></td></tr>'});
+  h+='</tbody></table>'});
+  h+='</body></html>';pw.document.write(h);pw.document.close();setTimeout(()=>{pw.print()},500);
+});
 
 /* ═══════════════════════════════════════
    EXCEL
    ═══════════════════════════════════════ */
 function normalizeCat(c){c=(c||'').toLowerCase().trim();if(c.includes('cien')||c.includes('bio')||c.includes('quim')||c.includes('fis')||c.includes('anat'))return'ciencias';if(c.includes('mate')||c.includes('arit')||c.includes('rm')||c.includes('alge')||c.includes('geo'))return'matematicas';if(c.includes('soc')||c.includes('hist')||c.includes('civ')||c.includes('econ')||c.includes('psico')||c.includes('comu'))return'social';if(c.includes('verb')||c.includes('rv')||c.includes('lengu')||c.includes('let'))return'verbal';if(c.includes('bien')||c.includes('medit')||c.includes('deport'))return'bienestar';return'descanso'}
 
-function parseExcel(file){return new Promise((ok,fail)=>{const r=new FileReader();r.onload=e=>{try{const wb=XLSX.read(e.target.result,{type:'array'});const ws=wb.Sheets[wb.SheetNames[0]];const data=XLSX.utils.sheet_to_json(ws,{defval:''});const sched={};data.forEach(row=>{let day,hour,subj,dur,cat;Object.keys(row).forEach(k=>{const kl=k.toLowerCase().trim();if(kl.includes('dia')||kl.includes('day'))day=row[k];if(kl.includes('hora')||kl.includes('hour')||kl.includes('time'))hour=row[k];if(kl.includes('mat')||kl.includes('subj')||kl.includes('curso')||kl.includes('materia'))subj=row[k];if(kl.includes('dur')||kl.includes('min')||kl.includes('tiempo'))dur=parseInt(row[k])||50;if(kl.includes('cat')||kl.includes('tipo')||kl.includes('area'))cat=row[k]});day=(day||'').toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'');if(!day||!DAYS_ES.includes(day))return;if(!sched[day])sched[day]=[];if(typeof hour==='number'){const totalH=hour*24;const h=Math.floor(totalH);const m=Math.round((totalH-h)*60);hour=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')}else if(typeof hour==='string'){hour=hour.trim();if(hour.includes(':')){const[h,m]=hour.split(':').map(Number);hour=String(h).padStart(2,'0')+':'+String(m||0).padStart(2,'0')}}sched[day].push({time:hour||'00:00',subject:subj||'Sin nombre',dur:dur||50,cat:normalizeCat(cat||subj)})});Object.values(sched).forEach(arr=>arr.sort((a,b)=>t2m(a.time)-t2m(b.time)));ok(sched)}catch(err){fail(err)}};r.onerror=fail;r.readAsArrayBuffer(file)})}
+function parseExcel(file){return new Promise((ok,fail)=>{const r=new FileReader();r.onload=e=>{try{const wb=XLSX.read(e.target.result,{type:'array'});const ws=wb.Sheets[wb.SheetNames[0]];const data=XLSX.utils.sheet_to_json(ws,{defval:''});const sched={};data.forEach(row=>{let day,hour,subj,dur,cat;Object.keys(row).forEach(k=>{const kl=k.toLowerCase().trim();if(kl.includes('dia')||kl.includes('day'))day=row[k];if(kl.includes('hora')||kl.includes('hour')||kl.includes('time'))hour=row[k];if(kl.includes('mat')||kl.includes('subj')||kl.includes('curso')||kl.includes('materia'))subj=row[k];if(kl.includes('dur')||kl.includes('min')||kl.includes('tiempo'))dur=parseInt(row[k])||50;if(kl.includes('cat')||kl.includes('tipo')||kl.includes('area'))cat=row[k]});day=(day||'').toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'');if(!day||!DAYS_ES.includes(day))return;if(!sched[day])sched[day]=[];if(typeof hour==='number'){const totalMin=Math.round(hour*1440);const h=Math.floor(totalMin/60);const m=totalMin%60;hour=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')}else if(typeof hour==='string'){hour=hour.trim();if(hour.includes(':')){const[h,m]=hour.split(':').map(Number);hour=String(h).padStart(2,'0')+':'+String(m||0).padStart(2,'0')}}sched[day].push({time:hour||'00:00',subject:subj||'Sin nombre',dur:dur||50,cat:normalizeCat(cat||subj)})});Object.values(sched).forEach(arr=>arr.sort((a,b)=>t2m(a.time)-t2m(b.time)));ok(sched)}catch(err){fail(err)}};r.onerror=fail;r.readAsArrayBuffer(file)})}
 
 function exportExcel(){
   const rows=[];DAYS_ES.forEach(day=>{(S.schedule[day]||[]).forEach(b=>{rows.push({Dia:day,Hora:b.time,Materia:b.subject,Duracion:b.dur,Categoria:b.cat})})});
@@ -623,7 +712,7 @@ function exportExcel(){
 }
 
 document.getElementById('expExcel').addEventListener('click',exportExcel);
-document.getElementById('impExcel').addEventListener('click',()=>{const i=document.createElement('input');i.type='file';i.accept='.xlsx,.xls,.csv';i.onchange=e=>{const f=e.target.files[0];if(!f)return;parseExcel(f).then(sched=>{S.schedule=sched;save();renderToday();alert('Horario importado: '+Object.values(sched).reduce((a,b)=>a+b.length,0)+' bloques')}).catch(err=>alert('Error: '+err.message))};i.click()});
+document.getElementById('impExcel').addEventListener('click',()=>{const i=document.createElement('input');i.type='file';i.accept='.xlsx,.xls,.csv';i.onchange=e=>{const f=e.target.files[0];if(!f)return;parseExcel(f).then(sched=>{S.schedule=sched;origSchedule=JSON.parse(JSON.stringify(sched));save();renderToday();alert('Horario importado: '+Object.values(sched).reduce((a,b)=>a+b.length,0)+' bloques')}).catch(err=>alert('Error: '+err.message))};i.click()});
 document.getElementById('expJSON').addEventListener('click',()=>{const j=JSON.stringify({schedule:S.schedule,logs:S.logs,name:S.name,pomoSessions:S.pomoSessions},null,2);const b=new Blob([j],{type:'application/json'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download='agendius_'+todayKey()+'.json';a.click();URL.revokeObjectURL(u)});
 document.getElementById('impJSON').addEventListener('click',()=>{const i=document.createElement('input');i.type='file';i.accept='.json';i.onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);S.schedule=d.schedule||{};S.logs=d.logs||{};S.name=d.name||'';S.pomoSessions=d.pomoSessions||0;save();renderToday();updateUI();alert('Restaurado')}catch(err){alert('Error')}};r.readAsText(f)};i.click()});
 
@@ -679,7 +768,7 @@ document.getElementById('setupGo').addEventListener('click',async()=>{
   try{
     const sched=await parseExcel(importedFile);
     if(!Object.keys(sched).length){document.getElementById('setupErr').textContent='No se encontro horario valido. Revisa el formato.';return}
-    S.name=name;S.schedule=sched;S.logs={};S.pomoSessions=0;save();
+    S.name=name;S.schedule=sched;origSchedule=JSON.parse(JSON.stringify(sched));S.logs={};S.pomoSessions=0;save();
     document.getElementById('setup').classList.remove('visible');
     document.getElementById('mainApp').style.display='';
     updateUI();go('today');
@@ -690,6 +779,7 @@ document.getElementById('setupSkip').addEventListener('click',()=>{
   const name=document.getElementById('setupName').value.trim()||'Estudiante';
   S.name=name;
   S.schedule={lunes:[{time:'08:00',subject:'Matematicas',dur:50,cat:'matematicas'},{time:'09:00',subject:'Ciencias',dur:50,cat:'ciencias'},{time:'10:00',subject:'Descanso',dur:10,cat:'descanso'},{time:'10:10',subject:'Historia',dur:50,cat:'social'}],martes:[{time:'08:00',subject:'Lenguaje',dur:50,cat:'verbal'},{time:'09:00',subject:'Fisica',dur:50,cat:'ciencias'}],miercoles:[{time:'08:00',subject:'Matematicas',dur:50,cat:'matematicas'},{time:'09:00',subject:'Quimica',dur:50,cat:'ciencias'}],jueves:[{time:'08:00',subject:'Historia',dur:50,cat:'social'},{time:'09:00',subject:'Biologia',dur:50,cat:'ciencias'}],viernes:[{time:'08:00',subject:'Matematicas',dur:50,cat:'matematicas'},{time:'09:00',subject:'Economia',dur:50,cat:'social'}],sabado:[{time:'08:00',subject:'Repaso',dur:50,cat:'ciencias'}],domingo:[]};
+  origSchedule=JSON.parse(JSON.stringify(S.schedule));
   S.logs={};S.pomoSessions=0;save();
   document.getElementById('setup').classList.remove('visible');
   document.getElementById('mainApp').style.display='';
