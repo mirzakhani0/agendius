@@ -804,7 +804,10 @@ function renderTodayView(){
     el.innerHTML=`
       <div class="cat-dot" style="background:${color}"></div>
       <div class="time">${b.time}</div>
-      <div class="info"><div class="subject">${b.subject}</div><div class="duration">${b.dur} min · <span class="badge ${CAT_BADGES[b.cat]||''}">${b.cat}</span></div></div>
+      <div class="info">
+        <div class="subject">${isActive?'<span class="badge badge-purple" style="margin-right:6px">▶ AHORA</span>':''}${b.subject}</div>
+        <div class="duration">${b.dur} min · <span class="badge ${CAT_BADGES[b.cat]||''}">${b.cat}</span></div>
+      </div>
       <div class="status-icon">${statusIcon}</div>
       <div class="block-actions">
         <button class="btn-complete" title="Completado">✓</button>
