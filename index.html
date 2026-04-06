@@ -36,7 +36,8 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
 .landing{position:fixed;inset:0;z-index:5000;background:var(--bg);display:flex;align-items:center;justify-content:center;transition:opacity .5s,transform .5s}
 .landing.hidden{opacity:0;pointer-events:none;transform:scale(1.05)}
 .landing-content{text-align:center;max-width:600px;padding:40px 24px}
-.landing-logo{font-size:3.5rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px;letter-spacing:-1px}
+.landing-logo{margin-bottom:8px}
+.landing-logo svg{width:280px;height:auto}
 .landing-tagline{font-size:1.1rem;color:var(--text2);margin-bottom:48px;font-weight:300}
 .landing-features{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:48px;text-align:left}
 .landing-feat{background:var(--surface);border:1px solid var(--surface2);border-radius:var(--radius);padding:20px;transition:var(--transition)}
@@ -81,7 +82,7 @@ html.dark .drop-zone:hover,html.dark .drop-zone.dragover{background:rgba(124,58,
 @media(min-width:1024px){.sidebar{display:flex}}
 .sidebar-header{padding:24px 20px 16px;border-bottom:1px solid var(--surface2)}
 .sidebar-brand{display:flex;align-items:center;gap:10px;margin-bottom:16px}
-.sidebar-brand .brand-icon{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--gold));display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.sidebar-brand .brand-icon{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--gold));display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0}
 .sidebar-brand h2{font-size:.95rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .sidebar-profile{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border-radius:var(--radius);border:1px solid var(--surface2)}
 .sidebar-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:#fff;flex-shrink:0}
@@ -289,7 +290,23 @@ ti-flat{color:var(--gold)}
      ═══════════════════════════════════════ -->
 <div class="landing" id="landing">
   <div class="landing-content">
-    <div class="landing-logo">Agendius</div>
+    <div class="landing-logo">
+      <svg viewBox="0 0 200 60" fill="none" xmlns="http://www.w3.org/2000/svg" width="280" height="84">
+        <defs>
+          <linearGradient id="logoGrad" x1="0" y1="0" x2="200" y2="60" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="var(--accent)"/>
+            <stop offset="100%" stop-color="var(--gold)"/>
+          </linearGradient>
+        </defs>
+        <rect x="2" y="8" width="44" height="44" rx="8" stroke="url(#logoGrad)" stroke-width="3" fill="none"/>
+        <path d="M2 22h44" stroke="url(#logoGrad)" stroke-width="3"/>
+        <path d="M13 8V3M31 8V3" stroke="url(#logoGrad)" stroke-width="3" stroke-linecap="round"/>
+        <rect x="9" y="28" width="7" height="7" rx="1.5" fill="url(#logoGrad)"/>
+        <rect x="21" y="28" width="7" height="7" rx="1.5" fill="url(#logoGrad)"/>
+        <rect x="33" y="28" width="7" height="7" rx="1.5" fill="url(#logoGrad)"/>
+        <text x="56" y="42" font-family="Sora, sans-serif" font-size="28" font-weight="800" fill="url(#logoGrad)" letter-spacing="-1">Agendius</text>
+      </svg>
+    </div>
     <p class="landing-tagline">Organiza tu estudio, alcanza tus metas</p>
     <div class="landing-features">
       <div class="landing-feat"><div class="feat-icon">📋</div><div class="feat-title">Horario Diario</div><div class="feat-desc">Visualiza y marca tus bloques de estudio al instante</div></div>
@@ -335,7 +352,21 @@ ti-flat{color:var(--gold)}
      ═══════════════════════════════════════ -->
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-header">
-    <div class="sidebar-brand"><div class="brand-icon">📚</div><h2>Agendius</h2></div>
+    <div class="sidebar-brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" width="22" height="22">
+          <rect x="4" y="6" width="32" height="28" rx="4" stroke="currentColor" stroke-width="2.5" fill="none"/>
+          <path d="M4 16h32" stroke="currentColor" stroke-width="2.5"/>
+          <path d="M14 6v-3M26 6v-3" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          <rect x="10" y="21" width="4" height="4" rx="1" fill="currentColor"/>
+          <rect x="18" y="21" width="4" height="4" rx="1" fill="currentColor"/>
+          <rect x="26" y="21" width="4" height="4" rx="1" fill="currentColor"/>
+          <rect x="10" y="28" width="4" height="3" rx="1" fill="currentColor"/>
+          <rect x="18" y="28" width="4" height="3" rx="1" fill="currentColor"/>
+        </svg>
+      </div>
+      <h2>Agendius</h2>
+    </div>
     <div class="sidebar-profile">
       <div class="sidebar-avatar" id="sAvatar">E</div>
       <div><div class="sidebar-user-name" id="sName">Estudiante</div><div class="sidebar-user-role">Plan de Estudio</div></div>
