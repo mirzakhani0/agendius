@@ -553,7 +553,7 @@ let state={
 async function sheetsCall(accion, hoja, datos, extra={}) {
   if (!state.config.sheetUrl) return {success:false, error:'Sin URL configurada'};
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 5000);
+  const timeout = setTimeout(() => controller.abort(), 15000);
   try {
     const body = {accion, hoja};
     if (datos) body.datos = datos;
