@@ -1111,12 +1111,58 @@ function renderAdmin(){
 /* ═══════════════════════════════════════
    INIT
    ═══════════════════════════════════════ */
-function init(){
+async function init(){
   loadState();
   state.selectedDay=getCurrentDayName();
   renderTodayView();
-  if(state.config.sheetUrl)updateSyncStatus('yellow','Listo para sync');
-  else updateSyncStatus('red','Sin Sheets configurado');
+
+  // Auto-sync al cargar
+  if(state.config.sheetUrl){
+    updateSyncStatus('yellow','Sincronizando...');
+    // Primero importar datos existentes desde Sheets
+    const r1 = await sheetsCall('leer','HORARIO');
+    if(r1.success && r1.data && r1.data.length > 0){
+      const sched={};
+      r1.data.forEach(row=>{
+        const day=row.dia||row['dia']; if(!day)return;
+        if(!sched[day])sched[day]=[];
+        sched[day].push({time:row.hora||row['hora']||'00:00',subject:row.materia||row['materia']||'',dur:parseInt(row.duracion_min||row['duracion_min']||30),cat:row.categoria||row['categoria']||'ciencias'});
+      });
+      state.schedule=sched;
+    }
+    // Importar logros
+    const r2 = await sheetsCall('leer','LOGROS');
+    if(r2.success && r2.data && r2.data.length > 0){
+      const logsByDate={};
+      r2.data.forEach(row=>{
+        const fecha=row.fecha||row['fecha']; if(!fecha)return;
+        if(!logsByDate[fecha])logsByDate[fecha]=[];
+        logsByDate[fecha].push({time:row.hora||row['hora'],subject:row.materia||row['materia'],status:row.status||row['status'],note:row.nota||row['nota']||null,timestamp:row.timestamp||row['timestamp']||Date.now()});
+      });
+      state.logs={...state.logs,...logsByDate};
+    }
+    // Importar config
+    const r3 = await sheetsCall('leer','CONFIGURACION');
+    if(r3.success && r3.data){
+      r3.data.forEach(row=>{
+        const key=row.clave||row['clave']; const val=row.valor||row['valor'];
+        if(key==='nombre_estudiante')state.config.name=val;
+        if(key==='pin_admin')state.config.pin=val;
+        if(key==='hora_inicio')state.config.startHour=val;
+        if(key==='colores_json')try{state.config.colors=JSON.parse(val)}catch(e){}
+      });
+    }
+    saveState();
+    renderTodayView();
+    updateSyncStatus('green','Sincronizado');
+
+    // Enviar horario actual a Sheets (por si hay cambios locales)
+    const horarioData=[];
+    DAYS_ES.forEach(day=>{(state.schedule[day]||[]).forEach(b=>{horarioData.push({dia:day,hora:b.time,materia:b.subject,duracion_min:b.dur,categoria:b.cat})})});
+    sheetsCall('escribir','HORARIO',horarioData);
+  } else {
+    updateSyncStatus('red','Sin Sheets configurado');
+  }
 
   setInterval(()=>{if(document.getElementById('view-today').classList.contains('active'))renderTodayView()},60000);
   if(state.config.notifications&&'Notification'in window)Notification.requestPermission();
