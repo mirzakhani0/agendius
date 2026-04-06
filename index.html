@@ -114,11 +114,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 /* Category chips */
 .chip{display:inline-block;padding:2px 8px;border-radius:6px;font-size:.65rem;font-weight:700;color:#fff}
-.chip-ciencias{background:var(--ciencias)}
-.chip-matematicas{background:var(--matematicas)}
-.chip-social{background:var(--social)}
-.chip-verbal{background:var(--verbal)}
-.chip-bienestar{background:var(--bienestar)}
+.chip-ciencias{background:#4caf50}
+.chip-matematicas{background:#7c4dff}
+.chip-social{background:#ff9800}
+.chip-verbal{background:#0ea5e9}
+.chip-bienestar{background:#ab47bc}
 .chip-descanso{background:transparent;border:1px solid #555;color:#999}
 
 /* ═══════ WEEK ═══════ */
@@ -414,7 +414,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 <script>
 const DAYS_ES=['domingo','lunes','martes','miercoles','jueves','viernes','sabado'];
 const DAYS_L=['Dom','Lun','Mar','Mie','Jue','Vie','Sab'];
-const CC={ciencias:'#2e7d32',matematicas:'#5c35cc',social:'#e65100',verbal:'#0ea5e9',bienestar:'#7c4dff',descanso:'#444'};
+const CC={ciencias:'#4caf50',matematicas:'#7c4dff',social:'#ff9800',verbal:'#0ea5e9',bienestar:'#ab47bc',descanso:'#555'};
 const CHIP={ciencias:'chip-ciencias',matematicas:'chip-matematicas',social:'chip-social',verbal:'chip-verbal',bienestar:'chip-bienestar',descanso:'chip-descanso'};
 let S={schedule:{},logs:{},name:'',pomoSessions:0,selDay:''};
 let origSchedule=null,editDay=curDay(),hasChanges=false;
@@ -473,6 +473,17 @@ function renderToday(){
     el.querySelector('.bp').addEventListener('click',e=>{e.stopPropagation();sStatus(dk,b.time,b.subject,'parcial',null);renderToday()});
     el.querySelector('.bs2').addEventListener('click',e=>{e.stopPropagation();sStatus(dk,b.time,b.subject,'saltado',null);renderToday()});
     list.appendChild(el);
+  });
+  // Highlight current block based on time
+  const now2=t2m(curTime());
+  list.querySelectorAll('.bcard').forEach(card=>{
+    const timeText=card.querySelector('.time').textContent;
+    const durText=card.querySelector('.duration').textContent;
+    const durMatch=durText.match(/(\d+)/);
+    if(!durMatch)return;
+    const dur=parseInt(durMatch[1]);
+    const bm=t2m(timeText);const em=bm+dur;
+    if(now2>=bm&&now2<em){card.classList.add('now')}
   });
 }
 
