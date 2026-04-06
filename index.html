@@ -33,9 +33,9 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
 /* ═══════════════════════════════════════
    LANDING PAGE
    ═══════════════════════════════════════ */
-.landing{position:fixed;inset:0;z-index:5000;background:var(--bg);display:flex;align-items:center;justify-content:center;transition:opacity .5s,transform .5s}
+.landing{position:fixed;inset:0;z-index:5000;background:var(--bg);display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;transition:opacity .5s,transform .5s}
 .landing.hidden{opacity:0;pointer-events:none;transform:scale(1.05)}
-.landing-content{text-align:center;max-width:600px;padding:40px 24px}
+.landing-content{text-align:center;max-width:600px;width:100%;padding:60px 24px 40px}
 .landing-logo{margin-bottom:8px}
 .landing-logo svg{width:280px;height:auto}
 .landing-tagline{font-size:1.1rem;color:var(--text2);margin-bottom:48px;font-weight:300}
@@ -52,7 +52,7 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
 /* ═══════════════════════════════════════
    SETUP
    ═══════════════════════════════════════ */
-.setup{position:fixed;inset:0;z-index:4000;background:var(--bg);display:none;align-items:center;justify-content:center;padding:20px}
+.setup{position:fixed;inset:0;z-index:4000;background:var(--bg);display:none;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px}
 .setup.visible{display:flex}
 .setup-card{max-width:480px;width:100%;text-align:center}
 .setup-card h2{font-size:1.6rem;font-weight:700;margin-bottom:8px}
