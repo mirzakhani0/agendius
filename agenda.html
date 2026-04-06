@@ -683,7 +683,14 @@ function loadState(){
 function getTodayKey(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function getCurrentDayName(){return DAYS_ES[new Date().getDay()]}
 function getCurrentTime(){const n=new Date();return String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')}
-function timeToMin(t){const[h,m]=t.split(':').map(Number);return h*60+m}
+function timeToMin(t){
+  if(t.includes('T')){const d=new Date(t);return d.getUTCHours()*60+d.getUTCMinutes()}
+  const[h,m]=t.split(':').map(Number);return h*60+m
+}
+function sheetTimeToHHMM(t){
+  if(t.includes('T')){const d=new Date(t);return String(d.getUTCHours()).padStart(2,'0')+':'+String(d.getUTCMinutes()).padStart(2,'0')}
+  return t;
+}
 function getDayLogs(k){return state.logs[k]||[]}
 function getBlockStatus(dk,time,subj){const l=getDayLogs(dk);const f=l.find(x=>x.time===time&&x.subject===subj);return f?f.status:null}
 function setBlockStatus(dk,time,subj,status,note){
@@ -1126,7 +1133,7 @@ async function init(){
       r1.data.forEach(row=>{
         const day=row.dia||row['dia']; if(!day)return;
         if(!sched[day])sched[day]=[];
-        sched[day].push({time:row.hora||row['hora']||'00:00',subject:row.materia||row['materia']||'',dur:parseInt(row.duracion_min||row['duracion_min']||30),cat:row.categoria||row['categoria']||'ciencias'});
+        sched[day].push({time:sheetTimeToHHMM(row.hora||row['hora']||'00:00'),subject:row.materia||row['materia']||'',dur:parseInt(row.duracion_min||row['duracion_min']||30),cat:row.categoria||row['categoria']||'ciencias'});
       });
       state.schedule=sched;
     }
