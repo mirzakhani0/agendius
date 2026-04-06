@@ -668,7 +668,7 @@ document.getElementById('restoreBtn').addEventListener('click',()=>{
 function getExportData(){const v=document.getElementById('expDaySel').value;if(v==='all')return null;return{[v]:S.schedule[v]||[]}}
 
 document.getElementById('expExcel').addEventListener('click',()=>{
-  const data=getExportData();const days=data?Object.keys(data):DAYS_ES.filter(d=>d!=='domingo');
+  const data=getExportData();const days=data?Object.keys(data):DAYS_ES;
   const rows=[];days.forEach(day=>{(data?data[day]:S.schedule[day]||[]).forEach(b=>{rows.push({Dia:day,Hora:b.time,Materia:b.subject,Duracion:b.dur,Categoria:b.cat})})});
   const logs=[];Object.keys(S.logs).forEach(dk=>{S.logs[dk].forEach(l=>{logs.push({Fecha:dk,Hora:l.time,Materia:l.subject,Estado:l.status,Nota:l.note||''})})});
   const wb=XLSX.utils.book_new();
@@ -678,14 +678,14 @@ document.getElementById('expExcel').addEventListener('click',()=>{
 });
 
 document.getElementById('expCSV').addEventListener('click',()=>{
-  const data=getExportData();const days=data?Object.keys(data):DAYS_ES.filter(d=>d!=='domingo');
+  const data=getExportData();const days=data?Object.keys(data):DAYS_ES;
   let csv='Dia,Hora,Materia,Duracion,Categoria\n';
   days.forEach(day=>{(data?data[day]:S.schedule[day]||[]).forEach(b=>{csv+=day+','+b.time+','+b.subject+','+b.dur+','+b.cat+'\n'})});
   const blob=new Blob([csv],{type:'text/csv'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='Agendius_'+todayKey()+'.csv';a.click();URL.revokeObjectURL(url);
 });
 
 document.getElementById('expPDF').addEventListener('click',()=>{
-  const data=getExportData();const days=data?Object.keys(data):DAYS_ES.filter(d=>d!=='domingo');
+  const data=getExportData();const days=data?Object.keys(data):DAYS_ES;
   const allBlocks={};days.forEach(d=>{allBlocks[d]=data?data[d]||[]:S.schedule[d]||[]});
   const pw=window.open('','_blank');
   let h='<html><head><title>Agendius - Horario Semanal</title><style>';
