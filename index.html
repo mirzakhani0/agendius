@@ -149,22 +149,22 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
 .ds button.act{background:var(--accent);color:#fff;border-color:var(--accent)}
 
 /* ═══════ BLOCKS ═══════ */
-.bl{display:flex;flex-direction:column;gap:5px}
-.bc{background:var(--surface);border:1px solid var(--glass-border);border-radius:var(--radius);padding:9px 12px;display:flex;align-items:center;gap:8px;cursor:pointer;transition:var(--transition);position:relative}
-.bc:hover{border-color:var(--accent);transform:translateX(2px)}
+.bl{display:flex;flex-direction:column;gap:6px}
+.bc{background:var(--surface);border:1px solid var(--glass-border);border-radius:var(--radius);padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:var(--transition);position:relative}
+.bc:hover{border-color:var(--accent);transform:translateX(3px)}
 .bc.now{border:1.5px solid var(--accent);background:rgba(37,99,235,.06)}
-.bc.done{opacity:.6;border-left:3px solid var(--ciencias)}
-.bc.half{opacity:.7;border-left:3px solid var(--gold)}
-.bc.skip{opacity:.35;text-decoration:line-through}
-.bc .bt{font-weight:700;font-size:.8rem;min-width:42px;color:var(--text)}
+.bc.done{opacity:.65;border-left:3px solid var(--ciencias)}
+.bc.half{opacity:.75;border-left:3px solid var(--gold)}
+.bc.skip{opacity:.4;text-decoration:line-through}
+.bc .bt{font-weight:700;font-size:.85rem;min-width:46px;color:var(--text)}
 .bc .bi2{flex:1}
-.bc .bi2 .bs{font-weight:600;font-size:.8rem}
-.bc .bi2 .bd{font-size:.65rem;color:var(--text3)}
-.bc .bsi{font-size:.9rem;min-width:18px;text-align:center}
-.bc .cd{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.ba{display:none;gap:3px}
+.bc .bi2 .bs{font-weight:600;font-size:.9rem}
+.bc .bi2 .bd{font-size:.7rem;color:var(--text3);margin-top:2px}
+.bc .bsi{font-size:1.1rem;min-width:22px;text-align:center}
+.bc .cd{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.ba{display:none;gap:5px}
 .bc:hover .ba{display:flex}
-.ba button{background:var(--surface2);border:none;color:var(--text);width:24px;height:24px;border-radius:50%;cursor:pointer;font-size:.7rem;transition:var(--transition)}
+.ba button{background:var(--surface2);border:none;color:var(--text);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.8rem;transition:var(--transition)}
 .ba .bc2:hover{background:var(--ciencias)}
 .ba .bp:hover{background:var(--gold)}
 .ba .bs2:hover{background:#ef4444}
@@ -397,10 +397,9 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
   <div class="vh"><h1 id="greet">Hola</h1><div class="dt"><div id="curDate"></div><div class="tm" id="curTime"></div></div></div>
   <div class="sts">
     <div class="st"><div class="sv" id="stDone">0</div><div class="sl">Hechos</div></div>
-    <div class="st"><div class="sv" id="stStreak">0</div><div class="sl">Racha</div></div>
+    <div class="st"><div class="sv" id="stStreak">0</div><div class="sl">Pomodoro</div></div>
     <div class="st"><div class="sv" id="stPct">0%</div><div class="sl">Avance</div></div>
   </div>
-  <div class="cp-wrap"><div class="cp"><svg width="64" height="64"><circle class="bg" cx="32" cy="32" r="28"></circle><circle class="fg" id="cpFg" cx="32" cy="32" r="28" stroke-dasharray="175.9" stroke-dashoffset="175.9"></circle></svg><div class="pct" id="cpPct">0%</div></div></div>
   <div class="ds" id="daySel"></div>
   <div class="bl" id="bList"></div>
   <div class="empty" id="emptyToday" style="display:none"><div class="ei">📭</div><div class="et">No hay bloques para hoy</div><div class="es">Ve a Admin → Editor para agregar bloques</div></div>
@@ -536,13 +535,7 @@ function go(v){
 }
 document.querySelectorAll('.nb,.bn button').forEach(b=>b.addEventListener('click',()=>go(b.dataset.v)));
 
-/* ═══════ SWIPE (Mobile) ═══════ */
-let touchStartX=0,touchStartY=0;
-document.addEventListener('touchstart',e=>{touchStartX=e.touches[0].clientX;touchStartY=e.touches[0].clientY},{passive:true});
-document.addEventListener('touchend',e=>{
-  const dx=e.changedTouches[0].clientX-touchStartX;const dy=e.changedTouches[0].clientY-touchStartY;
-  if(Math.abs(dx)>80&&Math.abs(dy)<40){const views=['today','week','pomo','admin'];const cur=document.querySelector('.view.act');const ci=views.findIndex(v=>'v-'+v===cur.id);if(dx<0&&ci<views.length-1)go(views[ci+1]);if(dx>0&&ci>0)go(views[ci-1])}
-},{passive:true});
+/* Swipe disabled by user request */
 
 /* ═══════ ATAJOS DE TECLADO ═══════ */
 document.addEventListener('keydown',e=>{
@@ -561,8 +554,6 @@ function renderToday(){
   document.getElementById('stDone').textContent=dc;
   document.getElementById('stStreak').textContent=S.pomoSessions;
   document.getElementById('stPct').textContent=pct+'%';
-  document.getElementById('cpPct').textContent=pct+'%';
-  const circ=2*Math.PI*28;document.getElementById('cpFg').style.strokeDashoffset=circ-(pct/100)*circ;
   document.getElementById('greet').textContent='Hola, '+S.name;
   document.getElementById('todayBadge').textContent=dc;
   const list=document.getElementById('bList');list.innerHTML='';
