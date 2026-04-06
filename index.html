@@ -609,7 +609,7 @@ let editDay=curDay();
 let origSchedule=null;
 let hasChanges=false;
 
-function renderAdmin(){populateEditDaySel();renderEditor()}
+function renderAdmin(){document.getElementById('adminPanel').classList.add('vis');populateEditDaySel();renderEditor()}
 function populateEditDaySel(){
   const sel=document.getElementById('editDaySel');if(!sel)return;sel.innerHTML='';
   DAYS_ES.forEach(d=>{if(d==='domingo')return;const o=document.createElement('option');o.value=d;o.textContent=d.charAt(0).toUpperCase()+d.slice(1);o.selected=d===editDay;sel.appendChild(o)});
